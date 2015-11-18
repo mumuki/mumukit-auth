@@ -16,7 +16,7 @@ module Mumukit::Auth
     end
 
     def protect!(slug)
-      raise 'unauthorized' unless allows?(slug)
+      raise Mumukit::Auth::UnauthorizedAccessError.new(unauthorized_message(slug)) unless allows?(slug)
     end
 
     def to_s
@@ -25,6 +25,12 @@ module Mumukit::Auth
 
     def as_json(options={})
       to_s
+    end
+
+    private
+
+    def unauthorized_message(slug)
+      "Unauthorized access to #{slug}. Permissions are #{@pattern}"
     end
   end
 end

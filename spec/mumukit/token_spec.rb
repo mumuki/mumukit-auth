@@ -19,8 +19,8 @@ describe Mumukit::Auth::Token do
     it { expect(decoded.uuid).to eq token.uuid }
     it { expect(decoded.iat).to eq token.iat }
 
-    it { expect { Mumukit::Auth::Token.decode('123445') }.to raise_error }
-    it { expect { Mumukit::Auth::Token.decode(nil) }.to raise_error }
+    it { expect { Mumukit::Auth::Token.decode('123445') }.to raise_error(Mumukit::Auth::InvalidTokenError) }
+    it { expect { Mumukit::Auth::Token.decode(nil) }.to raise_error(Mumukit::Auth::InvalidTokenError) }
   end
 
 end

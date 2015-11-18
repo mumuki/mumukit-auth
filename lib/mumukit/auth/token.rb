@@ -24,6 +24,8 @@ module Mumukit::Auth
     def self.decode(encoded)
       jwt = JWT.decode(encoded, SECRET, true, {:algorithm => ALGORITHM})[0]
       Token.build jwt['grant'], jwt['uuid'], jwt['iat']
+    rescue JWT::DecodeError => e
+      raise Mumukit::Auth::InvalidTokenError.new(e)
     end
 
     def self.build(slug, uuid = SecureRandom.hex(4), iat = DateTime.current.utc.to_i)
