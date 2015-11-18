@@ -1,3 +1,9 @@
+[![Stories in Ready](https://badge.waffle.io/mumuki/mumukit-auth.png?label=ready&title=Ready)](https://waffle.io/mumuki/mumukit-auth)
+[![Build Status](https://travis-ci.org/mumuki/mumukit-auth.svg?branch=master)](https://travis-ci.org/mumuki/mumukit-auth)
+[![Code Climate](https://codeclimate.com/github/mumuki/mumukit-auth/badges/gpa.svg)](https://codeclimate.com/github/mumuki/mumukit-auth)
+[![Test Coverage](https://codeclimate.com/github/mumuki/mumukit-auth/badges/coverage.svg)](https://codeclimate.com/github/mumuki/mumukit-auth)
+
+
 # Mumukit::Auth
 
 Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/mumukit/auth`. To experiment with that code, run `bin/console` for an interactive prompt.
