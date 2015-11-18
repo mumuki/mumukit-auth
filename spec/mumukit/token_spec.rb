@@ -4,7 +4,6 @@ describe Mumukit::Auth::Token do
   let(:slug) { 'Mumukit/Mumukit-pdep-fundamentos-ruby-guia-34-el-method-missing' }
   let(:token) { Mumukit::Auth::Token.build(slug) }
 
-
   describe '#encode' do
     it { expect(token.as_jwt['grant']).to eq slug }
     it { expect(token.encode).to_not eq Mumukit::Auth::Token.build(slug).encode }
@@ -23,4 +22,11 @@ describe Mumukit::Auth::Token do
     it { expect { Mumukit::Auth::Token.decode(nil) }.to raise_error(Mumukit::Auth::InvalidTokenError) }
   end
 
+  describe '#new_token' do
+    it { expect(Mumukit::Auth::Grant.new('*').new_token).to be_a(Mumukit::Auth::Token) }
+  end
+
+  describe '#to_mumukit_auth_grant' do
+    it { expect('*'.to_mumukit_auth_grant).to be_a(Mumukit::Auth::Grant) }
+  end
 end

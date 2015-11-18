@@ -28,8 +28,25 @@ module Mumukit::Auth
       raise Mumukit::Auth::InvalidTokenError.new(e)
     end
 
-    def self.build(slug, uuid = SecureRandom.hex(4), iat = DateTime.current.utc.to_i)
-      new Grant.new(slug), uuid, iat
+    def self.build(grantish, uuid = SecureRandom.hex(4), iat = DateTime.current.utc.to_i)
+      new grantish.to_mumukit_auth_grant, uuid, iat
     end
+  end
+
+
+  class Grant
+    def to_mumukit_auth_grant
+      self
+    end
+
+    def new_token
+      Token.build(self)
+    end
+  end
+end
+
+class String
+  def to_mumukit_auth_grant
+    Mumukit::Auth::Grant.new(self)
   end
 end
