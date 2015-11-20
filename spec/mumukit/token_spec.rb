@@ -23,10 +23,12 @@ describe Mumukit::Auth::Token do
   end
 
   describe '#new_token' do
-    it { expect(Mumukit::Auth::Grant.new('*').new_token).to be_a(Mumukit::Auth::Token) }
+    it { expect(Mumukit::Auth::Grant.parse('*').new_token).to be_a(Mumukit::Auth::Token) }
   end
 
   describe '#to_mumukit_auth_grant' do
     it { expect('*'.to_mumukit_auth_grant).to be_a(Mumukit::Auth::Grant) }
+    it { expect('!'.to_mumukit_auth_grant).to be_a(Mumukit::Auth::Grant) }
+    it { expect(nil.to_mumukit_auth_grant).to be_a(Mumukit::Auth::Grant) }
   end
 end

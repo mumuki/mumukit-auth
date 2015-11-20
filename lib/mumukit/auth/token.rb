@@ -47,6 +47,12 @@ end
 
 class String
   def to_mumukit_auth_grant
-    Mumukit::Auth::Grant.new(self)
+    Mumukit::Auth::Grant.parse(self)
+  end
+end
+
+class NilClass
+  def to_mumukit_auth_grant
+    Mumukit::Auth::NilGrant.new
   end
 end
