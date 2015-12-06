@@ -9,6 +9,7 @@ module Mumukit::Auth
     end
 
     def self.parse(pattern)
+      raise "invalid pattern #{pattern}" unless valid_pattern? pattern
       case pattern
         when nil then
           NilGrant.new
@@ -20,6 +21,21 @@ module Mumukit::Auth
           OrgGrant.new($1)
         else
           SingleGrant.new(pattern)
+      end
+    end
+
+    def self.valid_pattern?(pattern)
+      case pattern
+        when '*' then
+          true
+        when '!' then
+          true
+        when /(.*)\/\*/
+          true
+        when /(.*)\/(.*)/
+          true
+        else
+          false
       end
     end
 
