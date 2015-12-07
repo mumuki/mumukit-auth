@@ -19,6 +19,15 @@ module Mumukit::Auth
       end
     end
 
+    def self.dump(permission)
+      permission.to_s
+    end
+
+
+    def self.load(pattern)
+      parse(pattern)
+    end
+
     def self.parse(pattern)
       new(pattern.split(':').map { |grant_pattern| Grant.parse(grant_pattern) })
     end
