@@ -11,10 +11,6 @@ module Mumukit::Auth
     def self.parse(pattern)
       raise "invalid pattern #{pattern}" unless valid_pattern? pattern
       case pattern
-        when nil then
-          NilGrant.new
-        when '!' then
-          NilGrant.new
         when '*' then
           AllGrant.new
         when /(.*)\/\*/
@@ -53,16 +49,6 @@ module Mumukit::Auth
 
     def to_s
       '*'
-    end
-  end
-
-  class NilGrant < Grant
-    def allows?(slug)
-      false
-    end
-
-    def to_s
-      '!'
     end
   end
 
