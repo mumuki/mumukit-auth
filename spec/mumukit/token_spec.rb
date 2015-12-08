@@ -5,7 +5,7 @@ describe Mumukit::Auth::Token do
   let(:token) { Mumukit::Auth::Token.build(slug) }
 
   describe '#encode' do
-    it { expect(token.as_jwt['grant']).to eq slug }
+    it { expect(token.as_jwt['permissions']).to eq slug }
     it { expect(token.encode).to_not eq Mumukit::Auth::Token.build(slug).encode }
     it { expect(token.encode).to eq token.encode }
     it { expect(token.encode.size).to be < 384 }
@@ -14,7 +14,7 @@ describe Mumukit::Auth::Token do
 
   describe '#decode' do
     let(:decoded) { Mumukit::Auth::Token.decode(token.encode) }
-    it { expect(decoded.grant.to_s).to eq slug }
+    it { expect(decoded.permissions.to_s).to eq slug }
     it { expect(decoded.uuid).to eq token.uuid }
     it { expect(decoded.iat).to eq token.iat }
 
@@ -23,12 +23,15 @@ describe Mumukit::Auth::Token do
   end
 
   describe '#new_token' do
-    it { expect(Mumukit::Auth::Grant.parse('*').new_token).to be_a(Mumukit::Auth::Token) }
+    it { expect(Mumukit::Auth::Permissions.parse('*').new_token).to be_a(Mumukit::Auth::Token) }
   end
 
-  describe '#to_mumukit_auth_grant' do
-    it { expect('*'.to_mumukit_auth_grant).to be_a(Mumukit::Auth::Grant) }
-    it { expect('!'.to_mumukit_auth_grant).to be_a(Mumukit::Auth::Grant) }
-    it { expect(nil.to_mumukit_auth_grant).to be_a(Mumukit::Auth::Grant) }
+  describe '#to_mumukit_auth_permissions' do
+    it { expect('*'.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Permissions) }
+    it { expect('!'.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Permissions) }
+    it { expect(nil.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Permissions) }
+    it { expect('mumuki/*:pdep-utn/*'.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Permissions) }
+
   end
+
 end

@@ -5,10 +5,10 @@ module Mumukit::Auth
     SECRET = 'MY-SECRET'
     ALGORITHM = 'HS512'
 
-    attr_reader :grant, :iat, :uuid
+    attr_reader :permissions, :iat, :uuid
 
-    def initialize(grant, uuid, iat)
-      @grant = grant
+    def initialize(permissions, uuid, iat)
+      @permissions = permissions
       @uuid = uuid
       @iat = iat
     end
@@ -23,19 +23,19 @@ module Mumukit::Auth
 
     def self.decode(encoded)
       jwt = JWT.decode(encoded, SECRET, true, {:algorithm => ALGORITHM})[0]
-      Token.build jwt['grant'], jwt['uuid'], jwt['iat']
+      Token.build jwt['permissions'], jwt['uuid'], jwt['iat']
     rescue JWT::DecodeError => e
       raise Mumukit::Auth::InvalidTokenError.new(e)
     end
 
-    def self.build(grantish, uuid = SecureRandom.hex(4), iat = DateTime.current.utc.to_i)
-      new grantish.to_mumukit_auth_grant, uuid, iat
+    def self.build(permissionish, uuid = SecureRandom.hex(4), iat = DateTime.current.utc.to_i)
+      new permissionish.to_mumukit_auth_permissions, uuid, iat
     end
   end
 
 
-  class Grant
-    def to_mumukit_auth_grant
+  class Permissions
+    def to_mumukit_auth_permissions
       self
     end
 
@@ -46,13 +46,13 @@ module Mumukit::Auth
 end
 
 class String
-  def to_mumukit_auth_grant
-    Mumukit::Auth::Grant.parse(self)
+  def to_mumukit_auth_permissions
+    Mumukit::Auth::Permissions.parse(self)
   end
 end
 
 class NilClass
-  def to_mumukit_auth_grant
-    Mumukit::Auth::NilGrant.new
+  def to_mumukit_auth_permissions
+    Mumukit::Auth::Permissions.new([])
   end
 end

@@ -26,10 +26,4 @@ describe Mumukit::Auth::Grant do
     it { expect { grant.protect! 'fooz/baz' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
   end
 
-  describe 'grant none' do
-    let(:grant) { Mumukit::Auth::Grant.parse('!') }
-
-    it { expect(grant.allows? 'foo/bag').to be false }
-    it { expect(grant.allows? 'fooz/baz').to be false }
-  end
 end
