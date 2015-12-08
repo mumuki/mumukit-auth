@@ -1,9 +1,5 @@
 module Mumukit::Auth
   class Grant
-    def protect!(slug)
-      raise Mumukit::Auth::UnauthorizedAccessError.new(unauthorized_message(slug)) unless allows?(slug)
-    end
-
     def as_json(options={})
       to_s
     end
@@ -17,12 +13,6 @@ module Mumukit::Auth
         else
           SingleGrant.new(pattern)
       end
-    end
-
-    private
-
-    def unauthorized_message(slug)
-      "Unauthorized access to #{slug}. Permissions are #{to_s}"
     end
   end
 

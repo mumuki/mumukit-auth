@@ -16,6 +16,9 @@ describe Mumukit::Auth::Permissions do
     it { expect(permissions.allows? 'xfoo/baz').to be false }
     it { expect(permissions.allows? 'mumuki/funcional').to be true }
     it { expect(permissions.allows? 'mumuki/logico').to be true }
+
+    it { expect { permissions.protect! 'baz/funcional' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
+    it { expect { permissions.protect! 'mumuki/logico' }.not_to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
   end
 
   describe 'grant none' do

@@ -5,12 +5,8 @@ module Mumukit::Auth
       @grants = grants
     end
 
-    def as_json
-      to_s
-    end
-
-    def to_s
-      @grants.map(&:to_s).join(':')
+    def protect!(slug)
+      raise Mumukit::Auth::UnauthorizedAccessError.new(unauthorized_message(slug)) unless allows?(slug)
     end
 
     def allows?(slug)
@@ -19,10 +15,17 @@ module Mumukit::Auth
       end
     end
 
+    def as_json
+      to_s
+    end
+
+    def to_s
+      @grants.map(&:to_s).join(':')
+    end
+
     def self.dump(permission)
       permission.to_s
     end
-
 
     def self.load(pattern)
       parse(pattern)
@@ -32,5 +35,10 @@ module Mumukit::Auth
       new(pattern.split(':').map { |grant_pattern| Grant.parse(grant_pattern) })
     end
 
+    private
+
+    def unauthorized_message(slug)
+      "Unauthorized access to #{slug}. Permissions are #{to_s}"
+    end
   end
 end
