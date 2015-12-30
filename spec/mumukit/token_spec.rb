@@ -1,8 +1,4 @@
-require 'spec_helper'
-
-Mumukit::Auth.configure do |c|
-  c.client_id = 'foo'
-end
+require_relative '../spec_helper'
 
 describe Mumukit::Auth::Token do
 
@@ -12,6 +8,13 @@ describe Mumukit::Auth::Token do
 
     it { expect { nok.verify_client! }.to raise_error(Mumukit::Auth::InvalidTokenError) }
     it { expect { ok.verify_client! }.to_not raise_error }
+  end
+
+  describe 'decode_header' do
+    let(:header) { Mumukit::Auth::Token.encode_dummy_auth_header(myapp: {permissions: '*'}) }
+
+    it { expect(Mumukit::Auth::Token.decode_header(header).permissions('myapp')).to_not be nil }
+
   end
 
   describe 'permissions' do
