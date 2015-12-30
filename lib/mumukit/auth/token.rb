@@ -2,34 +2,39 @@ require 'jwt'
 
 module Mumukit::Auth
   class Token
-    SECRET = 'MY-SECRET'
-    ALGORITHM = 'HS512'
+    attr_reader :jwt
 
-    attr_reader :permissions, :iat, :uuid
-
-    def initialize(permissions, uuid, iat)
-      @permissions = permissions
-      @uuid = uuid
-      @iat = iat
+    def initialize(jwt)
+      @jwt = jwt
     end
 
-    def as_jwt
-      as_json
-    end
-
-    def encode
-      JWT.encode as_jwt, SECRET, ALGORITHM
+    def self.decode_header(header)
+      raise Mumukit::Auth::InvalidTokenError.new('missing authorization header') if header.nil?
+      decode authorization_header.split(' ').last
     end
 
     def self.decode(encoded)
-      jwt = JWT.decode(encoded, SECRET, true, {:algorithm => ALGORITHM})[0]
-      Token.build jwt['permissions'], jwt['uuid'], jwt['iat']
+      Token.new JWT.decode(encoded, JWT.base64url_decode(client_secret))[0]
     rescue JWT::DecodeError => e
       raise Mumukit::Auth::InvalidTokenError.new(e)
     end
 
-    def self.build(permissionish, uuid = SecureRandom.hex(4), iat = DateTime.current.utc.to_i)
-      new permissionish.to_mumukit_auth_permissions, uuid, iat
+    def verify_client!
+      raise Mumukit::Auth::InvalidTokenError.new('aud mismatch') if client_id != jwt['aud']
+    end
+
+    def permissions(app)
+      jwt['user_metadata'][app].try { |it| it['permissions'] }.to_mumukit_auth_permissions
+    end
+
+    private
+
+    def client_secret
+      Mumukit::Auth.config.client_secret
+    end
+
+    def client_id
+      Mumukit::Auth.config.client_id
     end
   end
 
@@ -37,10 +42,6 @@ module Mumukit::Auth
   class Permissions
     def to_mumukit_auth_permissions
       self
-    end
-
-    def new_token
-      Token.build(self)
     end
   end
 end

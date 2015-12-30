@@ -1,29 +1,33 @@
 require 'spec_helper'
 
+Mumukit::Auth.configure do |c|
+  c.client_id = 'foo'
+end
+
 describe Mumukit::Auth::Token do
-  let(:slug) { 'Mumukit/Mumukit-pdep-fundamentos-ruby-guia-34-el-method-missing' }
-  let(:token) { Mumukit::Auth::Token.build(slug) }
 
-  describe '#encode' do
-    it { expect(token.as_jwt['permissions']).to eq slug }
-    it { expect(token.encode).to_not eq Mumukit::Auth::Token.build(slug).encode }
-    it { expect(token.encode).to eq token.encode }
-    it { expect(token.encode.size).to be < 384 }
+  describe '#verify!' do
+    let(:ok) { Mumukit::Auth::Token.new('aud' => 'foo') }
+    let(:nok) { Mumukit::Auth::Token.new('aud' => 'bar') }
 
+    it { expect { nok.verify_client! }.to raise_error(Mumukit::Auth::InvalidTokenError) }
+    it { expect { ok.verify_client! }.to_not raise_error }
   end
 
-  describe '#decode' do
-    let(:decoded) { Mumukit::Auth::Token.decode(token.encode) }
-    it { expect(decoded.permissions.to_s).to eq slug }
-    it { expect(decoded.uuid).to eq token.uuid }
-    it { expect(decoded.iat).to eq token.iat }
+  describe 'permissions' do
+    let(:token) { Mumukit::Auth::Token.new(metadata) }
+    context 'when metadata' do
+      let(:metadata) { {'user_metadata' => {'myapp' => {'permissions' => '*'}}} }
 
-    it { expect { Mumukit::Auth::Token.decode('123445') }.to raise_error(Mumukit::Auth::InvalidTokenError) }
-    it { expect { Mumukit::Auth::Token.decode(nil) }.to raise_error(Mumukit::Auth::InvalidTokenError) }
-  end
+      it { expect(token.permissions 'myapp').to be_instance_of(Mumukit::Auth::Permissions) }
+    end
 
-  describe '#new_token' do
-    it { expect(Mumukit::Auth::Permissions.parse('*').new_token).to be_a(Mumukit::Auth::Token) }
+    context 'when no metadata' do
+      let(:metadata) { {'user_metadata' => {}} }
+
+      it { expect(token.permissions 'myapp').to be_instance_of(Mumukit::Auth::Permissions) }
+    end
+
   end
 
   describe '#to_mumukit_auth_permissions' do
