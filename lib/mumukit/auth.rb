@@ -1,5 +1,6 @@
 require 'active_support/all'
 
+require 'mumukit/auth/hash'
 require 'mumukit/auth/version'
 require 'mumukit/auth/exceptions'
 require 'mumukit/auth/grant'

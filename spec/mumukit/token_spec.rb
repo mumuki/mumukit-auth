@@ -18,16 +18,20 @@ describe Mumukit::Auth::Token do
   end
 
   describe 'permissions' do
-    let(:token) { Mumukit::Auth::Token.new(metadata) }
+    let(:token) { Mumukit::Auth::Token.new(jwt) }
     context 'when metadata' do
-      let(:metadata) { {'user_metadata' => {'myapp' => {'permissions' => '*'}}} }
+      let(:jwt) { {'user_metadata' => {'myapp' => {'permissions' => '*'}}} }
 
       it { expect(token.permissions 'myapp').to be_instance_of(Mumukit::Auth::Permissions) }
     end
 
-    context 'when no metadata' do
-      let(:metadata) { {'user_metadata' => {}} }
+    context 'when empty metadata' do
+      let(:jwt) { {'user_metadata' => {}} }
+      it { expect(token.permissions 'myapp').to be_instance_of(Mumukit::Auth::Permissions) }
+    end
 
+    context 'when no metadata' do
+      let(:jwt) { {} }
       it { expect(token.permissions 'myapp').to be_instance_of(Mumukit::Auth::Permissions) }
     end
 
