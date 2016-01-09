@@ -13,7 +13,7 @@ module Mumukit::Auth
     end
 
     def permissions(app)
-      jwt.dig('user_metadata', app, 'permissions').to_mumukit_auth_permissions
+      jwt.dig('app_metadata', app, 'permissions').to_mumukit_auth_permissions
     end
 
     def self.decode_header(header)
