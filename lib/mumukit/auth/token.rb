@@ -30,7 +30,7 @@ module Mumukit::Auth
     def self.encode_dummy_auth_header(metadata)
       encoded_token = JWT.encode(
           {aud: Mumukit::Auth.config.client_id,
-           user_metadata: metadata},
+           app_metadata: metadata},
           decoded_secret)
       'dummy token ' + encoded_token
     end
