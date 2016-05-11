@@ -22,7 +22,7 @@ class Mumukit::Auth::User
   end
 
   def apps
-    ['bibliotheca', 'classroom', 'admin']
+    ['bibliotheca', 'classroom', 'admin', 'atheneum']
   end
 
   def client
