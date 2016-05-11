@@ -11,14 +11,15 @@ class Mumukit::Auth::User
   end
 
   def update_permissions(key, permission)
-    client.update_user_metadata social_id, add_permission(key, permission)
+    add_permission!(key, permission)
+    client.update_user_metadata social_id, @metadata
   end
 
   def get_metadata
     apps.select { |app| @user[app].present? }.map { |app| { "#{app}" => @user[app] } }.reduce({}, :merge)
   end
 
-  def add_permission(key, permission)
+  def add_permission!(key, permission)
     if @metadata[key].present?
       @metadata[key]['permissions'] += ":#{permission}"
     else
