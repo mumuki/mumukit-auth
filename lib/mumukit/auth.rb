@@ -6,6 +6,7 @@ require 'mumukit/auth/exceptions'
 require 'mumukit/auth/grant'
 require 'mumukit/auth/token'
 require 'mumukit/auth/permissions'
+require 'mumukit/auth/user'
 
 require 'ostruct'
 

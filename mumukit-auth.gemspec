@@ -23,5 +23,6 @@ Gem::Specification.new do |spec|
 
 
   spec.add_dependency 'jwt'
+  spec.add_dependency 'auth0'
   spec.add_dependency 'activesupport'
 end
