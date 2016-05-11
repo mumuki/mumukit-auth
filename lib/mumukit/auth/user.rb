@@ -2,23 +2,29 @@ require 'auth0'
 
 class Mumukit::Auth::User
 
-  attr_accessor :social_id, :user
+  attr_accessor :social_id, :user, :metadata
 
   def initialize(social_id)
     @social_id = social_id
     @user = client.user @social_id
+    @metadata = get_metadata || {}
   end
 
-  def update_metadata(data)
-    client.update_user_metadata social_id, metadata.merge(data)
+  def update_permissions(key, permission)
+    client.update_user_metadata social_id, add_permission(key, permission)
   end
 
-  def metadata
-    metadata = {}
-    apps.each do |app|
-      metadata[app] = @user[app] if @user[app].present?
+  def get_metadata
+    apps.select { |app| @user[app].present? }.map { |app| { "#{app}" => @user[app] } }.reduce({}, :merge)
+  end
+
+  def add_permission(key, permission)
+    if @metadata[key].present?
+      @metadata[key]['permissions'] += ":#{permission}"
+    else
+      @metadata.merge!("#{key}" => { 'permissions' => permission })
     end
-    metadata
+    @metadata
   end
 
   def apps
