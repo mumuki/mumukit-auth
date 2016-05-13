@@ -19,7 +19,6 @@ class Mumukit::Auth::User
   end
 
   def add_permission!(key, permission)
-    puts metadata
     if metadata[key].present?
       metadata[key]['permissions'] = process_permission(key, permission)
     else
