@@ -19,12 +19,17 @@ class Mumukit::Auth::User
   end
 
   def add_permission!(key, permission)
+    puts metadata
     if metadata[key].present?
-      metadata[key]['permissions'] += ":#{permission}"
+      metadata[key]['permissions'] = process_permission(key, permission)
     else
       metadata.merge!("#{key}" => { 'permissions' => permission })
     end
     metadata
+  end
+
+  def process_permission(key, permission)
+    Mumukit::Auth::Permissions.load(metadata[key]['permissions'] + ":#{permission}").to_s
   end
 
   def permissions_for(app)

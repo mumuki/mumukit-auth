@@ -24,6 +24,7 @@ describe Mumukit::Auth::User do
       let(:user_data) { { id: 2, atheneum: { permissions: 'foo/bar' } }.deep_stringify_keys }
 
       it { expect(auth0.add_permission!('atheneum', 'test/*')).to eq({'atheneum' => {'permissions' => 'foo/bar:test/*' } })}
+      it { expect(auth0.add_permission!('atheneum', 'foo/bar')).to eq({'atheneum' => {'permissions' => 'foo/bar' } })}
     end
 
     context 'when none permissions' do
@@ -31,6 +32,6 @@ describe Mumukit::Auth::User do
 
       it { expect(auth0.add_permission!('atheneum', 'test/*')).to eq({'atheneum' => {'permissions' => 'test/*' } })}
     end
-  end
 
+  end
 end

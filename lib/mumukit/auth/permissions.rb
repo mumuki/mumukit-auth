@@ -20,7 +20,7 @@ module Mumukit::Auth
     end
 
     def to_s
-      @grants.map(&:to_s).join(':')
+      @grants.map(&:to_s).uniq.join(':')
     end
 
     def self.dump(permission)
