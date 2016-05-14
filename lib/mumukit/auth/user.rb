@@ -4,9 +4,9 @@ class Mumukit::Auth::User
 
   attr_accessor :social_id, :user
 
-  def initialize(social_id)
+  def initialize(social_id, user=nil)
     @social_id = social_id
-    @user = client.user @social_id
+    @user = user || client.user(@social_id)
   end
 
   def update_permissions(key, permission)
@@ -40,6 +40,16 @@ class Mumukit::Auth::User
   end
 
   def client
+    self.class.client
+  end
+
+  def self.from_email(email)
+    user = client.users("email:#{email}").first
+    raise Mumukit::Auth::EmailNotRegistered.new('There is no user registered with that email.') unless user.present?
+    new(user['user_id'])
+  end
+
+  def self.client
     Auth0Client.new(
         :client_id => ENV['MUMUKI_AUTH0_CLIENT_ID'],
         :client_secret => ENV['MUMUKI_AUTH0_CLIENT_SECRET'],

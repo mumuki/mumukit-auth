@@ -33,5 +33,14 @@ describe Mumukit::Auth::User do
       it { expect(auth0.add_permission!('atheneum', 'test/*')).to eq({'atheneum' => {'permissions' => 'test/*' } })}
     end
 
+    context 'when init from email' do
+      let(:user_data) { { id: 2, atheneum: { permissions: 'foo/bar' } }.deep_stringify_keys }
+      let(:user) { Mumukit::Auth::User.from_email 'aguspina87@gmail.com' }
+      before { expect(Auth0Client).to receive(:new).and_return(auth0_stub) }
+      before { expect(auth0_stub).to receive(:users).with('email:aguspina87@gmail.com').and_return([{ 'user_id' => 'auth0|1' }]) }
+
+      it { expect(user.metadata).to eq({'atheneum' => {'permissions' => 'foo/bar' } })}
+    end
+
   end
 end
