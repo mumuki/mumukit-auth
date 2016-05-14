@@ -4,4 +4,7 @@ module Mumukit::Auth
 
   class UnauthorizedAccessError < StandardError
   end
+
+  class EmailNotRegistered < StandardError
+  end
 end
