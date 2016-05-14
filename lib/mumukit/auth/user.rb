@@ -45,7 +45,7 @@ class Mumukit::Auth::User
 
   def self.from_email(email)
     user = client.users("email:#{email}").first
-    raise Mumukit::Auth::EmailNotRegistered unless user.present?
+    raise Mumukit::Auth::EmailNotRegistered.new('There is no user registered with that email.') unless user.present?
     new(user['user_id'])
   end
 
