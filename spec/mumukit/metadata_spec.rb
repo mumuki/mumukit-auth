@@ -20,4 +20,18 @@ describe Mumukit::Auth::Metadata do
   it { expect(metadata.student? 'baz/atheneum').to be false }
 
   it { expect(Mumukit::Auth::Token.from_env({}).metadata.student? 'foo/bar').to be false }
+
+  context 'when no permissions' do
+    let(:metadata) { Mumukit::Auth::Metadata.new({}) }
+    it { expect(metadata.add_permission!('atheneum', 'test/*').as_json).to eq({ 'atheneum' => { 'permissions' => 'test/*'} })}
+  end
+
+  context 'add_permission!' do
+    let(:metadata) { Mumukit::Auth::Metadata.new({atheneum: { permissions: 'foo/bar' } }.deep_stringify_keys) }
+    context 'when atheneum permissions' do
+
+      it { expect(metadata.add_permission!('atheneum', 'test/*').as_json).to eq({'atheneum' => {'permissions' => 'foo/bar:test/*' } })}
+      it { expect(metadata.add_permission!('atheneum', 'foo/bar').as_json).to eq({'atheneum' => {'permissions' => 'foo/bar' } })}
+    end
+  end
 end

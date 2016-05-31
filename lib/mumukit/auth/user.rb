@@ -10,25 +10,16 @@ class Mumukit::Auth::User
   end
 
   def update_permissions(key, permission)
-    add_permission!(key, permission)
-    client.update_user_metadata social_id, metadata
+    metadata.add_permission!(key, permission)
+    client.update_user_metadata social_id, metadata.as_json
+  end
+
+  def permissions_string
+    apps.select { |app| @user[app].present? }.map { |app| {app.to_s => @user[app]} }.reduce({}, :merge).to_json
   end
 
   def metadata
-    @metadata ||= apps.select { |app| @user[app].present? }.map { |app| { app.to_s => @user[app] } }.reduce({}, :merge)
-  end
-
-  def add_permission!(key, permission)
-    if metadata[key].present?
-      metadata[key]['permissions'] = process_permission(key, permission)
-    else
-      metadata.merge!("#{key}" => { 'permissions' => permission })
-    end
-    metadata
-  end
-
-  def process_permission(key, permission)
-    Mumukit::Auth::Permissions.load(metadata[key]['permissions'] + ":#{permission}").to_s
+    @metadata ||= Mumukit::Auth::Metadata.load(permissions_string)
   end
 
   def permissions_for(app)
@@ -41,6 +32,22 @@ class Mumukit::Auth::User
 
   def client
     self.class.client
+  end
+
+  def librarian?(slug)
+    metadata.librarian? slug
+  end
+
+  def admin?(slug)
+    metadata.admin? slug
+  end
+
+  def teacher?(slug)
+    metadata.teacher? slug
+  end
+
+  def student?(slug)
+    metadata.student? slug
   end
 
   def self.from_email(email)

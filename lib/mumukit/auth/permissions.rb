@@ -23,6 +23,10 @@ module Mumukit::Auth
       @grants.map(&:to_s).uniq.join(':')
     end
 
+    def present?
+      to_s.present?
+    end
+
     def self.dump(permission)
       permission.to_s
     end
