@@ -10,27 +10,9 @@ describe Mumukit::Auth::User do
     context 'when no atheneum permissions' do
       let(:user_data) { { id: 1, bibliotheca: { permissions: 'foo/bar' }, classroom: { permissions: 'foo/baz' } }.deep_stringify_keys }
 
-      it { expect(auth0.metadata).to eq('bibliotheca' => { 'permissions' => 'foo/bar' }, 'classroom' => { 'permissions' => 'foo/baz' }) }
-      it { expect(auth0.add_permission!('atheneum', 'test/*')).to eq({
-                                                                  'bibliotheca' => { 'permissions' => 'foo/bar' },
-                                                                  'classroom' => { 'permissions' => 'foo/baz' },
-                                                                  'atheneum' => { 'permissions' => 'test/*'}
-                                                                  })}
+      it { expect(auth0.metadata.as_json).to eq('bibliotheca' => { 'permissions' => 'foo/bar' }, 'classroom' => { 'permissions' => 'foo/baz' }) }
       it { expect(auth0.social_id).to eq('auth0|1') }
       it { expect(auth0.user).to eq(user_data) }
-    end
-
-    context 'when atheneum permissions' do
-      let(:user_data) { { id: 2, atheneum: { permissions: 'foo/bar' } }.deep_stringify_keys }
-
-      it { expect(auth0.add_permission!('atheneum', 'test/*')).to eq({'atheneum' => {'permissions' => 'foo/bar:test/*' } })}
-      it { expect(auth0.add_permission!('atheneum', 'foo/bar')).to eq({'atheneum' => {'permissions' => 'foo/bar' } })}
-    end
-
-    context 'when none permissions' do
-      let(:user_data) { { id: 2 }.stringify_keys }
-
-      it { expect(auth0.add_permission!('atheneum', 'test/*')).to eq({'atheneum' => {'permissions' => 'test/*' } })}
     end
 
     context 'when init from email' do
@@ -39,7 +21,7 @@ describe Mumukit::Auth::User do
       before { expect(Auth0Client).to receive(:new).and_return(auth0_stub) }
       before { expect(auth0_stub).to receive(:users).with('email:aguspina87@gmail.com').and_return([{ 'user_id' => 'auth0|1' }]) }
 
-      it { expect(user.metadata).to eq({'atheneum' => {'permissions' => 'foo/bar' } })}
+      it { expect(user.metadata.as_json).to eq({'atheneum' => {'permissions' => 'foo/bar' } })}
     end
 
   end

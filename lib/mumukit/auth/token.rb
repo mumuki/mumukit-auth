@@ -8,12 +8,20 @@ module Mumukit::Auth
       @jwt = jwt
     end
 
+    def metadata
+      @metadata ||= Mumukit::Auth::Metadata.new(jwt['app_metadata'] || {})
+    end
+
+    def permissions(app)
+      metadata.permissions(app)
+    end
+
     def verify_client!
       raise Mumukit::Auth::InvalidTokenError.new('aud mismatch') if Mumukit::Auth.config.client_id != jwt['aud']
     end
 
-    def permissions(app)
-      jwt.dig('app_metadata', app, 'permissions').to_mumukit_auth_permissions
+    def self.from_env(env)
+      new(env.dig('omniauth.auth', 'extra', 'raw_info') || {})
     end
 
     def self.decode_header(header)
