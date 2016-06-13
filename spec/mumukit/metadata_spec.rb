@@ -9,15 +9,23 @@ describe Mumukit::Auth::Metadata do
   end
 
   it { expect(metadata.teacher? 'foobar/baz').to be false }
+  it { expect(metadata.teacher? 'foobar').to be false }
+
   it { expect(metadata.teacher? 'foo/baz').to be true }
+  it { expect(metadata.teacher? 'foo').to be true }
 
   it { expect(metadata.admin? 'test/atheneum').to be true }
+  it { expect(metadata.admin? 'test').to be true }
 
   it { expect(metadata.librarian? 'test/atheneum').to be false }
+  it { expect(metadata.librarian? 'test').to be false }
 
   it { expect(metadata.student? 'test/atheneum').to be true }
+  it { expect(metadata.student? 'test').to be true }
   it { expect(metadata.student? 'foo/atheneum').to be true }
+  it { expect(metadata.student? 'foo').to be true }
   it { expect(metadata.student? 'baz/atheneum').to be false }
+  it { expect(metadata.student? 'baz').to be false }
 
   it { expect(Mumukit::Auth::Token.from_env({}).metadata.student? 'foo/bar').to be false }
 

@@ -11,6 +11,12 @@ require 'mumukit/auth/user'
 
 require 'ostruct'
 
+class Regexp
+  def matches?(string)
+    !!(self =~ string)
+  end
+end
+
 module Mumukit
   module Auth
     def self.configure

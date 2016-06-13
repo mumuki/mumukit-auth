@@ -10,9 +10,15 @@ module Mumukit::Auth
     end
 
     def allows?(slug)
-      @grants.any? do |grant|
-        grant.allows? slug
-      end
+      any_grant? { |grant| grant.allows? slug }
+    end
+
+    def access?(organization)
+      any_grant? { |grant| grant.access? organization }
+    end
+
+    def [](organization)
+      any_grant? { |grant| grant[organization] }
     end
 
     def as_json
@@ -40,6 +46,10 @@ module Mumukit::Auth
     end
 
     private
+
+    def any_grant?(&block)
+      @grants.any?(&block)
+    end
 
     def unauthorized_message(slug)
       "Unauthorized access to #{slug}. Permissions are #{to_s}"

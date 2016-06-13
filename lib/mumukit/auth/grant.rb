@@ -4,6 +4,14 @@ module Mumukit::Auth
       to_s
     end
 
+    def [](resource)
+      (self.class.slug? resource) ? allows?(resource) : access?(resource)
+    end
+
+    def self.slug?(resource_identifier)
+      /.*\/.*/.matches? resource_identifier
+    end
+
     def self.parse(pattern)
       case pattern
         when '*' then
@@ -21,6 +29,10 @@ module Mumukit::Auth
       true
     end
 
+    def access?(organization)
+      true
+    end
+
     def to_s
       '*'
     end
@@ -35,6 +47,10 @@ module Mumukit::Auth
       @slug == slug
     end
 
+    def access?(organization)
+      @slug.split('/')[0] == organization
+    end
+
     def to_s
       @slug
     end
@@ -46,13 +62,15 @@ module Mumukit::Auth
     end
 
     def allows?(slug)
-      !!(Regexp.new("^#{@org}/.*") =~ slug)
+      /^#{@org}\/.*/.matches? slug
+    end
+
+    def access?(organization)
+      @org == organization
     end
 
     def to_s
       "#{@org}/*"
     end
   end
-
-
 end

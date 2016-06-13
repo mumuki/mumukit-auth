@@ -15,29 +15,29 @@ class Mumukit::Auth::Metadata
     if permissions(app).present?
       @json[app] = process_permission(app, permission)
     else
-      @json.merge!("#{app}" => { 'permissions' => permission })
+      @json.merge!("#{app}" => {'permissions' => permission})
     end
     @json
   end
 
   def process_permission(app, permission)
-    { permissions: Mumukit::Auth::Permissions.load(permissions(app).as_json + ":#{permission}").to_s }
+    {permissions: Mumukit::Auth::Permissions.load(permissions(app).as_json + ":#{permission}").to_s}
   end
 
   def librarian?(slug)
-    allows? 'bibliotheca', slug
+    has_role? 'bibliotheca', slug
   end
 
   def admin?(slug)
-    allows? 'admin', slug
+    has_role? 'admin', slug
   end
 
   def teacher?(slug)
-    allows? 'classroom', slug
+    has_role? 'classroom', slug
   end
 
   def student?(slug)
-    allows? 'atheneum', slug
+    has_role? 'atheneum', slug
   end
 
   def self.load(json)
@@ -50,7 +50,7 @@ class Mumukit::Auth::Metadata
 
   private
 
-  def allows?(app, slug)
-    permissions(app).allows? slug
+  def has_role?(app, slug)
+    permissions(app)[slug]
   end
 end
