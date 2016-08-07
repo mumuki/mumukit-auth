@@ -1,4 +1,12 @@
 language: ruby
 rvm:
-  - 2.0.0
+- 2.0.0
 before_install: gem install bundler -v 1.10.6
+deploy:
+  provider: rubygems
+  api_key:
+    secure: tw3XXBDqeQRLOAgtBYpvQz9T8ywfvvBQhu1jD4UnbD5eGWbWIScpU9U7DLWNp5cNuHQ5StTI0Hr3cOLjrDxHNTfqH33a/tSUZMbLrn9m9nL/eUbzhA7DjgjPsto71lQ0mIj0U8DWDwWwIoxnuPeVZAZbxzev/SFgiPbzr0DvGFDZsdcJTd4TVFXA/ECh9lEuS/YFCIL0xF8tCusDuPX6/GzURypZQrr6+JapFHAsE6W2YYdFPWyXESIwpTdFUlfj/c4aZ2HLBmcFfZn64Uc/SY6vqptCPWSnyvUwfREb22TW7aLOLGsIHduhOc8t2TwG1LeOYpxzPMmhLqrxy54aTh6t7Q4160q9nTps8O14uhO+sCiGjZrpU6cxbIVVZ6Cc091rDM9cHipsiupX59S54kjw44dACBqZnIFAObquIYLI6p85GMliEDUW0tmVvg3O5u7AlNxAMNOexOAaO7spHkdRCZQXkDP+I2zDtQKpDXMpWbiEMhW9Lc2NHn4JspbSzq12WkAQh09lONJTiOXG9oaNvzx/IJLq2cksjFKYgZmleO5CGXDCT5CD6Nyea9z6A0Eg6nenmg8LkzbIH7bsgUvo0tARTJ4iV7REqXCdOy56Oz1RELRaabDKvFmdkxafHubKlREyx5Qq8ECQ2Yw9RWTpg0aj5blNsHU5d0Rb2HQ=
+  gem: mumukit-auth
+  on:
+    tags: true
+    repo: mumuki/mumukit-auth
