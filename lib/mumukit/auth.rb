@@ -1,21 +1,15 @@
 require 'active_support/all'
+require 'mumukit/core'
 
-require 'mumukit/auth/hash'
-require 'mumukit/auth/version'
-require 'mumukit/auth/exceptions'
-require 'mumukit/auth/grant'
-require 'mumukit/auth/metadata'
-require 'mumukit/auth/token'
-require 'mumukit/auth/permissions'
-require 'mumukit/auth/user'
+require_relative './auth/version'
+require_relative './auth/exceptions'
+require_relative './auth/grant'
+require_relative './auth/metadata'
+require_relative './auth/token'
+require_relative './auth/permissions'
+require_relative './auth/user'
 
 require 'ostruct'
-
-class Regexp
-  def matches?(string)
-    !!(self =~ string)
-  end
-end
 
 module Mumukit
   module Auth
