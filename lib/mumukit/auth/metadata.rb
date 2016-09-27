@@ -17,7 +17,6 @@ class Mumukit::Auth::Metadata
     else
       @json.merge!("#{app}" => {'permissions' => permission})
     end
-    @json
   end
 
   def remove_permission!(app, permission)
@@ -25,7 +24,6 @@ class Mumukit::Auth::Metadata
       @json[app] = process_remove_permission(app, permission)
     end
     @json.delete(app) if @json.dig(app, 'permissions').blank?
-    @json
   end
 
   def process_permission(new_permissions)
