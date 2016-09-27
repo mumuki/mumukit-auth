@@ -25,4 +25,25 @@ describe Mumukit::Auth::User do
     end
 
   end
+
+  describe 'update_permissions' do
+    let!(:auth0_stub) { double('auth0') }
+    let(:auth0) { Mumukit::Auth::User.new('auth0|1') }
+    let(:user_data) { { id: 1, bibliotheca: { permissions: 'foo/bar' }, classroom: { permissions: 'foo/baz' } }.deep_stringify_keys }
+
+    before { expect(Auth0Client).to receive(:new).and_return(auth0_stub) }
+    before { expect(auth0_stub).to receive(:user).with('auth0|1').and_return(user_data) }
+    before { expect(auth0_stub).to receive(:update_user_metadata).with('auth0|1', instance_of(Hash)) }
+    before { expect(Auth0Client).to receive(:new).and_return(auth0_stub) }
+
+    context 'add_permission' do
+      before { auth0.add_permission!('bibliotheca', 'test/*') }
+      it { expect(auth0.metadata.as_json).to eq('bibliotheca' => { 'permissions' => 'foo/bar:test/*' }, 'classroom' => { 'permissions' => 'foo/baz' }) }
+    end
+    context 'add_permission' do
+      before { auth0.remove_permission!('bibliotheca', 'foo/bar') }
+      it { expect(auth0.metadata.as_json).to eq('classroom' => { 'permissions' => 'foo/baz' }) }
+    end
+  end
+
 end
