@@ -9,9 +9,14 @@ class Mumukit::Auth::User
     @user = user || client.user(@social_id)
   end
 
-  def update_permissions(key, permission)
+  def add_permission!(key, permission)
     metadata.add_permission!(key, permission)
-    client.update_user_metadata social_id, metadata.as_json
+    update_user_metadata!
+  end
+
+  def remove_permission!(key, permission)
+    metadata.remove_permission!(key, permission)
+    update_user_metadata!
   end
 
   def permissions_string
@@ -62,6 +67,12 @@ class Mumukit::Auth::User
         :client_secret => ENV['MUMUKI_AUTH0_CLIENT_SECRET'],
         :domain => "mumuki.auth0.com"
     )
+  end
+
+  private
+
+  def update_user_metadata!
+    client.update_user_metadata social_id, metadata.as_json
   end
 
 end

@@ -13,15 +13,29 @@ class Mumukit::Auth::Metadata
 
   def add_permission!(app, permission)
     if permissions(app).present?
-      @json[app] = process_permission(app, permission)
+      @json[app] = process_add_permission(app, permission)
     else
       @json.merge!("#{app}" => {'permissions' => permission})
     end
-    @json
   end
 
-  def process_permission(app, permission)
-    {permissions: Mumukit::Auth::Permissions.load(permissions(app).as_json + ":#{permission}").to_s}
+  def remove_permission!(app, permission)
+    if permissions(app).present?
+      @json[app] = process_remove_permission(app, permission)
+    end
+    @json.delete(app) if @json.dig(app, 'permissions').blank?
+  end
+
+  def process_permission(new_permissions)
+    {'permissions' => Mumukit::Auth::Permissions.load(new_permissions).to_s}
+  end
+
+  def process_remove_permission(app, permission)
+    process_permission(permissions(app).as_json.split(':').reject { |it| it == permission }.join(':'))
+  end
+
+  def process_add_permission(app, permission)
+    process_permission(permissions(app).as_json + ":#{permission}")
   end
 
   def librarian?(slug)

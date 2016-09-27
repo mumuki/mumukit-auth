@@ -36,10 +36,21 @@ describe Mumukit::Auth::Metadata do
 
   context 'add_permission!' do
     let(:metadata) { Mumukit::Auth::Metadata.new({atheneum: { permissions: 'foo/bar' } }.deep_stringify_keys) }
-    context 'when atheneum permissions' do
-
-      it { expect(metadata.add_permission!('atheneum', 'test/*').as_json).to eq({'atheneum' => {'permissions' => 'foo/bar:test/*' } })}
-      it { expect(metadata.add_permission!('atheneum', 'foo/bar').as_json).to eq({'atheneum' => {'permissions' => 'foo/bar' } })}
+    context 'when no permissions added' do
+      before { metadata.add_permission!('classroom', 'test/*') }
+      it { expect(metadata.teacher? 'test/*').to eq true}
     end
+    context 'when no permissions added' do
+      before { metadata.add_permission!('atheneum', 'test/*') }
+      it { expect(metadata.student? 'test/*').to eq true}
+    end
+  end
+
+  context 'remove_permission!' do
+    let(:metadata) { Mumukit::Auth::Metadata.new({atheneum: { permissions: 'foo/bar:test/*:foo/baz' } }.deep_stringify_keys) }
+    before { metadata.remove_permission!('atheneum', 'test/*') }
+    it { expect(metadata.student? 'test/*').to eq false }
+    it { expect(metadata.student? 'foo/bar').to eq true }
+    it { expect(metadata.student? 'foo/baz').to eq true }
   end
 end
