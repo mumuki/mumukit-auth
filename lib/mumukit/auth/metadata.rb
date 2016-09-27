@@ -31,8 +31,7 @@ class Mumukit::Auth::Metadata
   end
 
   def process_remove_permission(app, permission)
-    process_permission(permissions(app).as_json.split(':').reject { |it| it == permission })
-
+    process_permission(permissions(app).as_json.split(':').reject { |it| it == permission }.join(':'))
   end
 
   def process_add_permission(app, permission)

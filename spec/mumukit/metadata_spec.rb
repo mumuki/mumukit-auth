@@ -47,8 +47,10 @@ describe Mumukit::Auth::Metadata do
   end
 
   context 'remove_permission!' do
-    let(:metadata) { Mumukit::Auth::Metadata.new({atheneum: { permissions: 'foo/bar:test/*' } }.deep_stringify_keys) }
+    let(:metadata) { Mumukit::Auth::Metadata.new({atheneum: { permissions: 'foo/bar:test/*:foo/baz' } }.deep_stringify_keys) }
     before { metadata.remove_permission!('atheneum', 'test/*') }
     it { expect(metadata.student? 'test/*').to eq false }
+    it { expect(metadata.student? 'foo/bar').to eq true }
+    it { expect(metadata.student? 'foo/baz').to eq true }
   end
 end
