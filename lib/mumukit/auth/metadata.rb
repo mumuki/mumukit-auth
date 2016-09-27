@@ -20,6 +20,18 @@ class Mumukit::Auth::Metadata
     @json
   end
 
+  def remove_permission!(app, permission)
+    if permissions(app).present?
+      @json[app] = process_remove_permission(app, permission)
+    end
+    @json
+  end
+
+  def process_remove_permission(app, permission)
+    new_permissions = permissions(app).as_json.split(':').reject { |it| it == permission }
+    {permissions: Mumukit::Auth::Permissions.load(new_permissions).to_s}
+  end
+
   def process_permission(app, permission)
     {permissions: Mumukit::Auth::Permissions.load(permissions(app).as_json + ":#{permission}").to_s}
   end

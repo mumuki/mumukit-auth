@@ -42,4 +42,13 @@ describe Mumukit::Auth::Metadata do
       it { expect(metadata.add_permission!('atheneum', 'foo/bar').as_json).to eq({'atheneum' => {'permissions' => 'foo/bar' } })}
     end
   end
+
+  context 'remove_permission!' do
+    let(:metadata) { Mumukit::Auth::Metadata.new({atheneum: { permissions: 'foo/bar:test/*' } }.deep_stringify_keys) }
+    context 'when atheneum permissions' do
+
+      it { expect(metadata.remove_permission!('atheneum', 'test/*').as_json).to eq({'atheneum' => {'permissions' => 'foo/bar' } })}
+      it { expect(metadata.remove_permission!('atheneum', 'foo/bar').as_json).to eq({'atheneum' => {'permissions' => 'test/*' } })}
+    end
+  end
 end
