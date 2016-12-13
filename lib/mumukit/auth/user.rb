@@ -1,9 +1,9 @@
 class Mumukit::Auth::User
 
-  attr_accessor :social_id, :user
+  attr_accessor :uid, :user
 
-  def initialize(social_id, user=nil)
-    @social_id = social_id
+  def initialize(uid, user=nil)
+    @uid = uid
     @user = user
   end
 
