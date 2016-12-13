@@ -11,7 +11,7 @@ module Mumukit::Auth
         when /(.*)\/\*/
           FirstPartGrant.new($1)
         else
-          SingleGrant.new(Slug.from pattern)
+          SingleGrant.new(Slug.parse pattern)
       end
     end
   end
@@ -32,7 +32,7 @@ module Mumukit::Auth
     end
 
     def allows?(resource_slug)
-      resource_slug.first == first
+      resource_slug.first == @first
     end
 
 

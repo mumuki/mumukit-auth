@@ -1,48 +1,61 @@
 require 'spec_helper'
 
 describe Mumukit::Auth::User do
-  describe 'build_metadata' do
-    let!(:auth0_stub) { double('auth0') }
-    let(:auth0) { Mumukit::Auth::User.new('auth0|1') }
-    before { expect(auth0_stub).to receive(:user).with('auth0|1').and_return(user_data) }
-
-    context 'when no atheneum permissions' do
-      let(:user_data) { { id: 1, bibliotheca: { permissions: 'foo/bar' }, classroom: { permissions: 'foo/baz' } }.deep_stringify_keys }
-
-      it { expect(auth0.metadata.as_json).to eq('bibliotheca' => { 'permissions' => 'foo/bar' }, 'classroom' => { 'permissions' => 'foo/baz' }) }
-      it { expect(auth0.uid).to eq('auth0|1') }
-      it { expect(auth0.user).to eq(user_data) }
-    end
-
-    context 'when init from email' do
-      let(:user_data) { { id: 2, atheneum: { permissions: 'foo/bar' } }.deep_stringify_keys }
-      let(:user) { Mumukit::Auth::User.from_email 'aguspina87@gmail.com' }
-      before { expect(Auth0Client).to receive(:new).and_return(auth0_stub) }
-      before { expect(auth0_stub).to receive(:users).with('email:aguspina87@gmail.com').and_return([{ 'user_id' => 'auth0|1' }]) }
-
-      it { expect(user.metadata.as_json).to eq({'atheneum' => {'permissions' => 'foo/bar' } })}
-    end
-
+  let(:user) do
+    Mumukit::Auth::User.new(
+        'foo@bar.com',
+        [Mumukit::Auth::Permission.parse(student: 'foo/*:test/*'),
+         Mumukit::Auth::Permission.parse(admin: 'test/*'),
+         Mumukit::Auth::Permission.parse(classroom: 'foo/baz')])
   end
 
-  describe 'update_permissions' do
-    let!(:auth0_stub) { double('auth0') }
-    let(:auth0) { Mumukit::Auth::User.new('auth0|1') }
-    let(:user_data) { { id: 1, bibliotheca: { permissions: 'foo/bar' }, classroom: { permissions: 'foo/baz' } }.deep_stringify_keys }
+  it { expect(user.teacher? 'foobar/baz').to be false }
+  it { expect(user.teacher? 'foobar').to be false }
 
-    before { expect(Auth0Client).to receive(:new).and_return(auth0_stub) }
-    before { expect(auth0_stub).to receive(:user).with('auth0|1').and_return(user_data) }
-    before { expect(auth0_stub).to receive(:update_user_metadata).with('auth0|1', instance_of(Hash)) }
-    before { expect(Auth0Client).to receive(:new).and_return(auth0_stub) }
+  it { expect(user.teacher? 'foo/baz').to be true }
+  it { expect(user.teacher? 'foo').to be true }
 
-    context 'add_permission' do
-      before { auth0.add_permission!('bibliotheca', 'test/*') }
-      it { expect(auth0.metadata.as_json).to eq('bibliotheca' => { 'permissions' => 'foo/bar:test/*' }, 'classroom' => { 'permissions' => 'foo/baz' }) }
+  it { expect(user.admin? 'test/atheneum').to be true }
+  it { expect(user.admin? 'test').to be true }
+
+  it { expect(user.librarian? 'test/atheneum').to be false }
+  it { expect(user.librarian? 'test').to be false }
+
+  it { expect(user.student? 'test/atheneum').to be true }
+  it { expect(user.student? 'test').to be true }
+  it { expect(user.student? 'foo/atheneum').to be true }
+  it { expect(user.student? 'foo').to be true }
+  it { expect(user.student? 'baz/atheneum').to be false }
+  it { expect(user.student? 'baz').to be false }
+
+  it { expect(Mumukit::Auth::Token.from_env({}).user.student? 'foo/bar').to be false }
+
+  context 'when no permissions' do
+    let(:user) { Mumukit::Auth::User.new('foo@bar.com') }
+    before { user.add_permission! 'atheneum', 'test/*' }
+
+    it { expect(user.as_json).to json_like(uid: 'foo@bar.com',
+                                           permissions: {atheneum: 'test}/*'}) }
+    it { expect(user.has_role? :atheneum, 'test/baz').to be_true }
+  end
+
+  context 'add_permission!' do
+    let(:user) { Mumukit::Auth::Metadata.new({atheneum: {scopes: 'foo/bar'}}.deep_stringify_keys) }
+    context 'when no permissions added' do
+      before { user.add_permission!('classroom', 'test/*') }
+      it { expect(user.teacher? 'test/*').to eq true }
     end
-    context 'add_permission' do
-      before { auth0.remove_permission!('bibliotheca', 'foo/bar') }
-      it { expect(auth0.metadata.as_json).to eq('classroom' => { 'permissions' => 'foo/baz' }) }
+    context 'when no permissions added' do
+      before { user.add_permission!('atheneum', 'test/*') }
+      it { expect(user.student? 'test/*').to eq true }
     end
   end
 
+  context 'remove_permission!' do
+    let(:user) { Mumukit::Auth::Metadata.new({atheneum: {scopes: 'foo/bar:test/*:foo/baz'}}.deep_stringify_keys) }
+    before { user.remove_permission!('atheneum', 'test/*') }
+    it { expect(user.student? 'test/*').to eq false }
+    it { expect(user.student? 'foo/bar').to eq true }
+    it { expect(user.student? 'foo/baz').to eq true }
+  end
 end

@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe Mumukit::Auth::Permissions do
   describe 'one grant' do
-    let(:permissions) { Mumukit::Auth::Permissions.parse('*') }
+    let(:scopes) { Mumukit::Auth::Permissions.parse('*') }
 
     it { expect(permissions.allows? 'foo/bar').to be true }
   end
 
   describe 'two grants' do
-    let(:permissions) { Mumukit::Auth::Permissions.parse('foo/*:mumuki/*') }
+    let(:scopes) { Mumukit::Auth::Permissions.parse('foo/*:mumuki/*') }
 
     it { expect(permissions.allows? 'foo/bag').to be true }
     it { expect(permissions.allows? 'foo/baz').to be true }
@@ -22,7 +22,7 @@ describe Mumukit::Auth::Permissions do
   end
 
   describe 'grant none' do
-    let(:permissions) { Mumukit::Auth::Permissions.parse('') }
+    let(:scopes) { Mumukit::Auth::Permissions.parse('') }
 
     it { expect(permissions.allows? 'foo/bag').to be false }
     it { expect(permissions.allows? 'fooz/baz').to be false }

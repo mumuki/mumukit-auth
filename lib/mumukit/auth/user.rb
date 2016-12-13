@@ -1,50 +1,53 @@
 class Mumukit::Auth::User
+  include Mumukit::Auth::Roles
 
-  attr_accessor :uid, :user
+  attr_accessor :uid, :permissions
 
-  def initialize(uid, user=nil)
+  def initialize(uid, permissions=[])
     @uid = uid
-    @user = user
+    @permissions = permissions
   end
 
-  def add_permission!(key, permission)
-    metadata.add_permission!(key, permission)
+  def has_role?(role, resource_slug)
+    !!permission_as(role)&.allows?(resource_slug)
   end
 
-  def remove_permission!(key, permission)
-    metadata.remove_permission!(key, permission)
+  def permission_as(role)
+    permissions.find { |it| it.role == role }
   end
 
-  def permissions_string
-    apps.select { |app| @user[app].present? }.map { |app| {app.to_s => @user[app]} }.reduce({}, :merge).to_json
+  def add_scope!(role, *scopes)
+    permission = permission_as(role)
+    if permission.present?
+      permission.scopes += scopes
+    else
+      permissions << Mumukit::Auth::Permission.new(role, scopes)
+    end
   end
 
-  def metadata
-    @metadata ||= Mumukit::Auth::Metadata.load(permissions_string)
+  def remove_scope!(role, scope)
+    permission_as(role).& scopes.& delete(scope)
   end
 
-  def permissions_for(app)
-    metadata[app]['permissions']
+  def replace_scope!(role, old, new)
+    remove_scope! role, old
+    add_scope! role, new
   end
 
-  def apps
-    ['bibliotheca', 'classroom', 'admin', 'atheneum']
+  def as_json(_options={})
+    {uid: uid, permissions: permissions.map { |it| it.as_json(_options) }.inject(&:merge)}
   end
 
-  def librarian?(slug)
-    metadata.librarian? slug
+  def self.parse(hash)
+    new uid: hash[:uid], permissions: hash[:permissions].map { |k, v| Permission.parse k => v }
   end
 
-  def admin?(slug)
-    metadata.admin? slug
+  def self.load(json)
+    parse(JSON.parse(json))
   end
 
-  def teacher?(slug)
-    metadata.teacher? slug
-  end
-
-  def student?(slug)
-    metadata.student? slug
+  def self.dump(user)
+    user.to_json
   end
 
 end

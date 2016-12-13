@@ -34,7 +34,7 @@ module Mumukit::Auth
       new (parts + ['_'] * 2).take(2)
     end
 
-    def self.from(slug)
+    def self.parse(slug)
       validate_slug! slug
 
       self.new *slug.split('/')
