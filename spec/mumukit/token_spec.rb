@@ -11,7 +11,7 @@ describe Mumukit::Auth::Token do
   end
 
   describe 'decode_header' do
-    let(:header) { Mumukit::Auth::Token.encode_dummy_auth_header(myapp: {scopes: '*'}) }
+    let(:header) { Mumukit::Auth::Token.encode_dummy_auth_header(myapp: {grants: '*'}) }
 
     it { expect(Mumukit::Auth::Token.decode_header(header).permissions('myapp')).to_not be nil }
 
@@ -21,29 +21,29 @@ describe Mumukit::Auth::Token do
     let(:token) { Mumukit::Auth::Token.new(jwt) }
     context 'when metadata' do
       let(:jwt) { {'app_metadata' => {'myapp' => {'permissions' => '*'}}} }
-      let(:scopes) { token.permissions 'myapp' }
+      let(:grants) { token.permissions 'myapp' }
 
-      it { expect(permissions).to be_instance_of(Mumukit::Auth::Permission) }
+      it { expect(permissions).to be_instance_of(Mumukit::Auth::Scope) }
       it { expect(permissions.allows? 'pdep-utn/mumuki-guia-funcional-introduccion').to eq true }
     end
 
     context 'when empty metadata' do
       let(:jwt) { {'app_metadata' => {}} }
-      it { expect(token.permissions 'myapp').to be_instance_of(Mumukit::Auth::Permission) }
+      it { expect(token.permissions 'myapp').to be_instance_of(Mumukit::Auth::Scope) }
     end
 
     context 'when no metadata' do
       let(:jwt) { {} }
-      it { expect(token.permissions 'myapp').to be_instance_of(Mumukit::Auth::Permission) }
+      it { expect(token.permissions 'myapp').to be_instance_of(Mumukit::Auth::Scope) }
     end
 
   end
 
   describe '#to_mumukit_auth_permissions' do
-    it { expect('*'.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Permission) }
-    it { expect('!'.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Permission) }
-    it { expect(nil.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Permission) }
-    it { expect('mumuki/*:pdep-utn/*'.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Permission) }
+    it { expect('*'.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Scope) }
+    it { expect('!'.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Scope) }
+    it { expect(nil.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Scope) }
+    it { expect('mumuki/*:pdep-utn/*'.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Scope) }
 
   end
 

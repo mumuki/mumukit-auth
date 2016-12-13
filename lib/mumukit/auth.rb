@@ -7,8 +7,8 @@ require_relative './auth/version'
 require_relative './auth/exceptions'
 require_relative './auth/grant'
 require_relative './auth/token'
-require_relative './auth/permission'
-require_relative './auth/user'
+require_relative './auth/scope'
+require_relative './auth/permissions'
 
 require 'ostruct'
 
