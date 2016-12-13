@@ -5,20 +5,12 @@ module Mumukit::Auth
       @grants = grants
     end
 
-    def protect!(slug)
-      raise Mumukit::Auth::UnauthorizedAccessError.new(unauthorized_message(slug)) unless allows?(slug)
+    def protect!(resource_slug)
+      raise Mumukit::Auth::UnauthorizedAccessError.new(unauthorized_message(resource_slug)) unless allows?(resource_slug)
     end
 
-    def allows?(slug)
-      any_grant? { |grant| grant.allows? slug }
-    end
-
-    def access?(organization)
-      any_grant? { |grant| grant.access? organization }
-    end
-
-    def [](organization)
-      any_grant? { |grant| grant[organization] }
+    def allows?(resource_slug)
+      any_grant? { |grant| grant.allows? resource_slug }
     end
 
     def as_json

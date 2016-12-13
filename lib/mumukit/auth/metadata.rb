@@ -38,20 +38,20 @@ class Mumukit::Auth::Metadata
     process_permission(permissions(app).as_json + ":#{permission}")
   end
 
-  def librarian?(slug)
-    has_role? 'bibliotheca', slug
+  def librarian?(resource_slug)
+    has_role? 'bibliotheca', resource_slug
   end
 
-  def admin?(slug)
-    has_role? 'admin', slug
+  def admin?(resource_slug)
+    has_role? 'admin', resource_slug
   end
 
-  def teacher?(slug)
-    has_role? 'classroom', slug
+  def teacher?(resource_slug)
+    has_role? 'classroom', resource_slug
   end
 
-  def student?(slug)
-    has_role? 'atheneum', slug
+  def student?(resource_slug)
+    has_role? 'atheneum', resource_slug
   end
 
   def self.load(json)
@@ -64,7 +64,7 @@ class Mumukit::Auth::Metadata
 
   private
 
-  def has_role?(app, slug)
-    permissions(app)[slug]
+  def has_role?(app, resource_slug)
+    permissions(app).allows? resource_slug
   end
 end

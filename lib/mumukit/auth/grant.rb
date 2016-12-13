@@ -4,32 +4,20 @@ module Mumukit::Auth
       to_s
     end
 
-    def [](resource)
-      (self.class.slug? resource) ? allows?(resource) : access?(resource)
-    end
-
-    def self.slug?(resource_identifier)
-      /.*\/.*/.matches? resource_identifier
-    end
-
     def self.parse(pattern)
       case pattern
         when '*' then
           AllGrant.new
         when /(.*)\/\*/
-          OrgGrant.new($1)
+          FirstPartGrant.new($1)
         else
-          SingleGrant.new(pattern)
+          SingleGrant.new(Slug.from pattern)
       end
     end
   end
 
   class AllGrant < Grant
-    def allows?(slug)
-      true
-    end
-
-    def access?(organization)
+    def allows?(_resource_slug)
       true
     end
 
@@ -38,39 +26,32 @@ module Mumukit::Auth
     end
   end
 
+  class FirstPartGrant < Grant
+    def initialize(first)
+      @first = first
+    end
+
+    def allows?(resource_slug)
+      resource_slug.first == first
+    end
+
+
+    def to_s
+      "#{@first}/*"
+    end
+  end
+
   class SingleGrant < Grant
     def initialize(slug)
       @slug = slug
     end
 
-    def allows?(slug)
-      @slug == slug
-    end
-
-    def access?(organization)
-      @slug.split('/')[0] == organization
+    def allows?(resource_slug)
+      @slug == resource_slug
     end
 
     def to_s
       @slug
-    end
-  end
-
-  class OrgGrant < Grant
-    def initialize(org)
-      @org = org
-    end
-
-    def allows?(slug)
-      /^#{@org}\/.*/.matches? slug
-    end
-
-    def access?(organization)
-      @org == organization
-    end
-
-    def to_s
-      "#{@org}/*"
     end
   end
 end
