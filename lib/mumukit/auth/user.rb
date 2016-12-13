@@ -1,22 +1,18 @@
-require 'auth0'
-
 class Mumukit::Auth::User
 
   attr_accessor :social_id, :user
 
   def initialize(social_id, user=nil)
     @social_id = social_id
-    @user = user || client.user(@social_id)
+    @user = user
   end
 
   def add_permission!(key, permission)
     metadata.add_permission!(key, permission)
-    update_user_metadata!
   end
 
   def remove_permission!(key, permission)
     metadata.remove_permission!(key, permission)
-    update_user_metadata!
   end
 
   def permissions_string
@@ -35,10 +31,6 @@ class Mumukit::Auth::User
     ['bibliotheca', 'classroom', 'admin', 'atheneum']
   end
 
-  def client
-    self.class.client
-  end
-
   def librarian?(slug)
     metadata.librarian? slug
   end
@@ -53,26 +45,6 @@ class Mumukit::Auth::User
 
   def student?(slug)
     metadata.student? slug
-  end
-
-  def self.from_email(email)
-    user = client.users("email:#{email}").first
-    raise Mumukit::Auth::EmailNotRegistered.new('There is no user registered with that email.') unless user.present?
-    new(user['user_id'])
-  end
-
-  def self.client
-    Auth0Client.new(
-        :client_id => ENV['MUMUKI_AUTH0_CLIENT_ID'],
-        :client_secret => ENV['MUMUKI_AUTH0_CLIENT_SECRET'],
-        :domain => "mumuki.auth0.com"
-    )
-  end
-
-  private
-
-  def update_user_metadata!
-    client.update_user_metadata social_id, metadata.as_json
   end
 
 end
