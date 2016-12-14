@@ -4,28 +4,35 @@ class Mumukit::Auth::Permissions
   attr_accessor :scopes
 
   def initialize(scopes={})
+    raise 'invalid scopes' if scopes.any? { |key, value| value.class != Mumukit::Auth::Scope  }
+
     @scopes = scopes
   end
 
-  def has_role?(role, resource_slug)
-    !!scopes[role]&.allows?(resource_slug)
+  def has_permission?(role, resource_slug)
+    !!scope_for(role)&.allows?(resource_slug)
+  end
+
+  def has_role?(role)
+    scopes[role].present?
   end
 
   def scope_for(role)
+    self.scopes[role]
+  end
+
+  def add_permission!(role, *grants)
     self.scopes[role] ||= Mumukit::Auth::Scope.new
+    scope_for(role)&.add_grant! *grants
   end
 
-  def add_scope!(role, *grants)
-    scope_for(role).grants << grants
+  def remove_permission!(role, grant)
+    scope_for(role)&.remove_grant!(grant)
   end
 
-  def remove_scope!(role, grant)
-    scope_for(role).grants.delete(grant)
-  end
-
-  def update_scope!(role, old_grant, new_grant)
-    remove_scope! role, old_grant
-    add_scope! role, new_grant
+  def update_permission!(role, old_grant, new_grant)
+    remove_permission! role, old_grant
+    add_permission! role, new_grant
   end
 
   def as_json(options={})

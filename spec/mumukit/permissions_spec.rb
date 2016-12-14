@@ -2,63 +2,89 @@ require 'spec_helper'
 
 describe Mumukit::Auth::Permissions do
   let(:permissions) do
-    Mumukit::Auth::Permissions.new(student: Mumukit::Auth::Scope.parse('foo/*:test/*'),
-                                   admin: Mumukit::Auth::Scope.parse('test/*'),
-                                   classroom: Mumukit::Auth::Scope.parse('foo/baz'))
+    Mumukit::Auth::Permissions.new(
+        student: Mumukit::Auth::Scope.parse('foo/*:test/*'),
+        owner: Mumukit::Auth::Scope.parse('test/*'),
+        teacher: Mumukit::Auth::Scope.parse('foo/baz'))
   end
 
   it { expect(permissions).to json_like Mumukit::Auth::Permissions.parse(student: 'foo/*:test/*',
-                                                                         admin: 'test/*',
-                                                                         classroom: 'foo/baz') }
+                                                                         owner: 'test/*',
+                                                                         teacher: 'foo/baz') }
   it { expect(permissions).to json_like Mumukit::Auth::Permissions.parse('student' => 'foo/*:test/*',
-                                                                         'admin' => 'test/*',
-                                                                         'classroom' => 'foo/baz') }
+                                                                         'owner' => 'test/*',
+                                                                         'teacher' => 'foo/baz') }
   it { expect(permissions.teacher? 'foobar/baz').to be false }
-  it { expect(permissions.teacher? 'foobar').to be false }
+  it { expect(permissions.teacher? 'foobar/_').to be false }
+
+  it { expect(permissions.teacher? Mumukit::Auth::Slug.parse('foo/baz')).to be true }
+  it { expect(permissions.teacher? Mumukit::Auth::Slug.parse('foobar/_')).to be false }
 
   it { expect(permissions.teacher? 'foo/baz').to be true }
-  it { expect(permissions.teacher? 'foo').to be true }
+  it { expect(permissions.teacher? 'foo/_').to be true }
 
-  it { expect(permissions.owner? 'test/atheneum').to be true }
-  it { expect(permissions.owner? 'test').to be true }
+  it { expect(permissions.owner? 'test/student').to be true }
+  it { expect(permissions.owner? 'test/_').to be true }
 
-  it { expect(permissions.writer? 'test/atheneum').to be false }
-  it { expect(permissions.writer? 'test').to be false }
+  it { expect(permissions.writer? 'test/student').to be false }
+  it { expect(permissions.writer? 'test/_').to be false }
 
-  it { expect(permissions.student? 'test/atheneum').to be true }
-  it { expect(permissions.student? 'test').to be true }
-  it { expect(permissions.student? 'foo/atheneum').to be true }
-  it { expect(permissions.student? 'foo').to be true }
-  it { expect(permissions.student? 'baz/atheneum').to be false }
-  it { expect(permissions.student? 'baz').to be false }
-
-  it { expect(Mumukit::Auth::Token.from_env({}).permissions.student? 'foo/bar').to be false }
+  it { expect(permissions.student? 'foo/bar').to be true }
+  it { expect(permissions.student? 'test/student').to be true }
+  it { expect(permissions.student? 'foo/student').to be true }
+  it { expect(permissions.student? 'baz/student').to be false }
+  it { expect(permissions.student? 'baz/_').to be false }
 
   context 'when no permissions' do
     let(:permissions) { Mumukit::Auth::Permissions.parse({}) }
-    before { permissions.add_scope! 'atheneum', 'test/*' }
 
-    it { expect(permissions.as_json).to json_like(atheneum: 'test}/*') }
-    it { expect(permissions.has_role? :atheneum, 'test/baz').to be_true }
+    before { permissions.add_permission! :student, 'test/*' }
+
+    it { expect(permissions.as_json).to json_like(student: 'test/*') }
+    it { expect(permissions.has_permission? :student, 'test/baz').to be_true }
+    it { expect(permissions.has_role? :student).to be_true }
   end
 
   context 'add_scope!' do
-    let(:permissions) { Mumukit::Auth::Permissions.parse(atheneum: 'foo/bar') }
+    let(:permissions) { Mumukit::Auth::Permissions.parse(student: 'foo/bar') }
     context 'when no permissions added' do
-      before { permissions.add_scope!('classroom', 'test/*') }
+      before { permissions.add_permission!(:teacher, 'test/*') }
+
+      it { expect(permissions.has_role? :teacher).to eq true }
       it { expect(permissions.teacher? 'test/*').to eq true }
+
     end
     context 'when no permissions added' do
-      before { permissions.add_scope!('atheneum', 'test/*') }
+      before { permissions.add_permission!(:student, 'test/*') }
+
+      it { expect(permissions.has_role? :student).to eq true }
       it { expect(permissions.student? 'test/*').to eq true }
     end
   end
 
   context 'remove_scope!' do
-    let(:permissions) { Mumukit::Auth::Permissions.parse(atheneum: 'foo/bar:test/*:foo/baz') }
-    before { permissions.remove_scope!('atheneum', 'test/*') }
-    it { expect(permissions.student? 'test/*').to eq false }
-    it { expect(permissions.student? 'foo/bar').to eq true }
-    it { expect(permissions.student? 'foo/baz').to eq true }
+    let(:permissions) { Mumukit::Auth::Permissions.parse(student: 'foo/bar:test/*:foo/baz') }
+
+    context 'when permission is present' do
+      before { permissions.remove_permission!(:student, 'test/*') }
+      it { expect(permissions.student? 'test/*').to eq false }
+      it { expect(permissions.student? 'foo/bar').to eq true }
+      it { expect(permissions.student? 'foo/baz').to eq true }
+    end
+
+    context 'when scope is not present' do
+      before { permissions.remove_permission!(:student, 'baz/*') }
+      it { expect(permissions.student? 'test/*').to eq true }
+      it { expect(permissions.student? 'foo/bar').to eq true }
+      it { expect(permissions.student? 'foo/baz').to eq true }
+    end
+
+    context 'when role is not present' do
+      before { permissions.remove_permission!(:teacher, 'baz/*') }
+      it { expect(permissions.student? 'test/*').to eq true }
+      it { expect(permissions.student? 'foo/bar').to eq true }
+      it { expect(permissions.student? 'foo/baz').to eq true }
+    end
   end
+
 end

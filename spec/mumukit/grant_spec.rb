@@ -4,13 +4,21 @@ describe Mumukit::Auth::Grant do
   describe 'grant all' do
     let(:grant) { Mumukit::Auth::Grant.parse('*') }
 
+    it { expect(grant.allows? '_/_').to be true }
+
+    it { expect(grant.allows? 'foo/_').to be true }
+
     it { expect(grant.allows? 'foo/bar').to be true }
+
   end
 
   describe 'grant org' do
     let(:grant) { Mumukit::Auth::Grant.parse('foo/*') }
 
+    it { expect(grant.allows? '_/_').to be true }
+
     it { expect(grant.allows? 'foo/_').to be true }
+
     it { expect(grant.allows? 'fooz/_').to be false }
     it { expect(grant.allows? 'xfoo/_').to be false }
 
@@ -23,7 +31,10 @@ describe Mumukit::Auth::Grant do
   describe 'grant one' do
     let(:grant) { Mumukit::Auth::Grant.parse('foo/bar') }
 
+    it { expect(grant.allows? '_/_').to be true }
+
     it { expect(grant.allows? 'foo/_').to be true }
+
     it { expect(grant.allows? 'fooz/_').to be false }
     it { expect(grant.allows? 'xfoo/_').to be false }
 

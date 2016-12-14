@@ -14,6 +14,15 @@ module Mumukit::Auth
       any_grant? { |grant| grant.allows? resource_slug }
     end
 
+    def add_grant!(*grants)
+      self.grants.push *grants.map(&:to_mumukit_grant)
+    end
+
+    def remove_grant!(grant)
+      grant = grant.to_mumukit_grant
+      self.grants.delete(grant)
+    end
+
     def to_s
       @grants.map(&:to_s).uniq.join(':')
     end
@@ -23,7 +32,7 @@ module Mumukit::Auth
     end
 
     def self.parse(string)
-      new(string.split(':').map { |grant_pattern| Grant.parse(grant_pattern) })
+      new(string.split(':').map(&:to_mumukit_grant))
     end
 
     def as_json(_options={})

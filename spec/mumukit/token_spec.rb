@@ -11,40 +11,22 @@ describe Mumukit::Auth::Token do
   end
 
   describe 'decode_header' do
-    let(:header) { Mumukit::Auth::Token.encode_dummy_auth_header(myapp: {grants: '*'}) }
+    let(:header) { Mumukit::Auth::Token.encode_dummy_auth_header(foo: 'bar') }
 
-    it { expect(Mumukit::Auth::Token.decode_header(header).permissions('myapp')).to_not be nil }
-
+    it { expect(Mumukit::Auth::Token.decode_header(header).metadata).to json_like foo: 'bar' }
   end
 
   describe 'permissions' do
     let(:token) { Mumukit::Auth::Token.new(jwt) }
-    context 'when metadata' do
-      let(:jwt) { {'app_metadata' => {'myapp' => {'permissions' => '*'}}} }
-      let(:grants) { token.permissions 'myapp' }
-
-      it { expect(permissions).to be_instance_of(Mumukit::Auth::Scope) }
-      it { expect(permissions.allows? 'pdep-utn/mumuki-guia-funcional-introduccion').to eq true }
-    end
 
     context 'when empty metadata' do
-      let(:jwt) { {'app_metadata' => {}} }
-      it { expect(token.permissions 'myapp').to be_instance_of(Mumukit::Auth::Scope) }
+      let(:jwt) { {'metadata' => {}} }
+      it { expect(token.metadata).to eq({}) }
     end
 
     context 'when no metadata' do
       let(:jwt) { {} }
-      it { expect(token.permissions 'myapp').to be_instance_of(Mumukit::Auth::Scope) }
+      it { expect(token.metadata).to eq({}) }
     end
-
   end
-
-  describe '#to_mumukit_auth_permissions' do
-    it { expect('*'.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Scope) }
-    it { expect('!'.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Scope) }
-    it { expect(nil.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Scope) }
-    it { expect('mumuki/*:pdep-utn/*'.to_mumukit_auth_permissions).to be_a(Mumukit::Auth::Scope) }
-
-  end
-
 end
