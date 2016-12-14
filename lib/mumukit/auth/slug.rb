@@ -41,7 +41,7 @@ module Mumukit::Auth
 
     def self.join(*parts)
       raise 'Slugs must have up to two parts' if parts.length > 2
-      new(*(parts + ['_'] * 2).take(2))
+      new(*parts.pad_with('_', 2))
     end
 
     def self.parse(slug)
