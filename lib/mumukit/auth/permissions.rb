@@ -1,58 +1,54 @@
-module Mumukit::Auth
-  class Permissions
+class Mumukit::Auth::Permissions
+  include Mumukit::Auth::Roles
 
-    def initialize(grants)
-      @grants = grants
-    end
+  attr_accessor :scopes
 
-    def protect!(slug)
-      raise Mumukit::Auth::UnauthorizedAccessError.new(unauthorized_message(slug)) unless allows?(slug)
-    end
+  def initialize(scopes={})
+    raise 'invalid scopes' if scopes.any? { |key, value| value.class != Mumukit::Auth::Scope  }
 
-    def allows?(slug)
-      any_grant? { |grant| grant.allows? slug }
-    end
-
-    def access?(organization)
-      any_grant? { |grant| grant.access? organization }
-    end
-
-    def [](organization)
-      any_grant? { |grant| grant[organization] }
-    end
-
-    def as_json
-      to_s
-    end
-
-    def to_s
-      @grants.map(&:to_s).uniq.join(':')
-    end
-
-    def present?
-      to_s.present?
-    end
-
-    def self.dump(permission)
-      permission.to_s
-    end
-
-    def self.load(pattern)
-      parse(pattern)
-    end
-
-    def self.parse(pattern)
-      new(pattern.split(':').map { |grant_pattern| Grant.parse(grant_pattern) })
-    end
-
-    private
-
-    def any_grant?(&block)
-      @grants.any?(&block)
-    end
-
-    def unauthorized_message(slug)
-      "Unauthorized access to #{slug}. Permissions are #{to_s}"
-    end
+    @scopes = scopes
   end
+
+  def has_permission?(role, resource_slug)
+    !!scope_for(role)&.allows?(resource_slug)
+  end
+
+  def has_role?(role)
+    scopes[role].present?
+  end
+
+  def scope_for(role)
+    self.scopes[role]
+  end
+
+  def add_permission!(role, *grants)
+    self.scopes[role] ||= Mumukit::Auth::Scope.new
+    scope_for(role)&.add_grant! *grants
+  end
+
+  def remove_permission!(role, grant)
+    scope_for(role)&.remove_grant!(grant)
+  end
+
+  def update_permission!(role, old_grant, new_grant)
+    remove_permission! role, old_grant
+    add_permission! role, new_grant
+  end
+
+  def as_json(options={})
+    scopes.as_json(options)
+  end
+
+  def self.parse(hash)
+    new(Hash[hash.map { |role, grants| [role, Mumukit::Auth::Scope.parse(grants)] }])
+  end
+
+  def self.load(json)
+    parse(JSON.parse(json))
+  end
+
+  def self.dump(user)
+    user.to_json
+  end
+
 end
