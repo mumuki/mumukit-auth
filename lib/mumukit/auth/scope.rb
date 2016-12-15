@@ -24,7 +24,7 @@ module Mumukit::Auth
     end
 
     def to_s
-      @grants.map(&:to_s).uniq.join(':')
+      grants.map(&:to_s).join(':')
     end
 
     def present?
@@ -36,7 +36,7 @@ module Mumukit::Auth
     end
 
     def as_json(_options={})
-      grants.join(':')
+      to_s
     end
 
     private
