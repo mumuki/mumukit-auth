@@ -2,7 +2,7 @@ module Mumukit::Auth
   class Store
 
     def initialize(db_name)
-      @db = Daybreak::DB.new "#{db_name}.db", default: {}
+      @db = Daybreak::DB.new "#{db_name}.db", default: '{}'
     end
 
     def set!(key, value)
