@@ -23,5 +23,6 @@ Gem::Specification.new do |spec|
 
 
   spec.add_dependency 'jwt'
+  spec.add_dependency 'daybreak'
   spec.add_dependency 'mumukit-core', '~> 0.4.2'
 end
