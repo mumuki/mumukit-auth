@@ -41,8 +41,8 @@ describe Mumukit::Auth::Permissions do
     before { permissions.add_permission! :student, 'test/*' }
 
     it { expect(permissions.as_json).to json_like(student: 'test/*') }
-    it { expect(permissions.has_permission? :student, 'test/baz').to be_true }
-    it { expect(permissions.has_role? :student).to be_true }
+    it { expect(permissions.has_permission? :student, 'test/baz').to be true }
+    it { expect(permissions.has_role? :student).to be true }
   end
 
   context 'add_scope!' do
