@@ -6,9 +6,7 @@ module Mumukit::Auth
     end
 
     def set!(key, value)
-      @db.lock do
-        @db.update! :"#{key}" => value.to_json
-      end
+      @db.update! key.to_sym => value.to_json
     end
 
     def get(key)
