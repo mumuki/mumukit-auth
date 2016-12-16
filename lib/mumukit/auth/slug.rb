@@ -39,9 +39,24 @@ module Mumukit::Auth
       self
     end
 
+    def self.from_options(hash)
+      first = hash[:first] || hash[:organization]
+      second = hash[:second] || hash[:repository] || hash[:course] || hash[:content]
+      new(first, second)
+     end
+
     def self.join(*parts)
       raise 'Slugs must have up to two parts' if parts.length > 2
-      new(*parts.pad_with('_', 2))
+
+      if parts.first.is_a? Hash
+        from_options parts.first
+      else
+        new(*parts.pad_with('_', 2))
+      end
+    end
+
+    def self.join_s(*args)
+      join(*args).to_s
     end
 
     def self.parse(slug)
