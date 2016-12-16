@@ -48,6 +48,26 @@ Mumukit::Auth:Slug.new('foo', 'bar').to_s
 ### Roles
 ### Token
 
+Tokens are easy-to-use JWT tokens. 
+
+```ruby
+# Creating
+Mumukit::Auth::Token.new metadata: {key: value}, iss: '...', aud: '...'  
+
+# Decoding
+Mumukit::Auth::Token.decode('eyJh...XVCJ9.eA....X0.yRQ..Xw')
+Mumukit::Auth::Token.decode_header('bearer eyJh...XVCJ9.eA....X0.yRQ..Xw')
+
+# Encoding
+Mumukit::Auth::Token.encode(metadata: {key: value}) # answers a **string**
+
+# Verification
+a_token.verify_client!
+
+# Usage
+a_token.jwt
+a_token.metadata
+```
 
 ## License
 
