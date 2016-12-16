@@ -28,3 +28,9 @@ RSpec::Matchers.define :json_like do |expected, options={}|
     EOS
   end
 end
+
+Rspec.configure do |config|
+  config.after(:each) do
+    FileUtils.rm ['test.db'], force: true
+  end
+end
