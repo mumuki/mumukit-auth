@@ -44,7 +44,11 @@ class Mumukit::Auth::Permissions
   end
 
   def self.load(json)
-    parse(JSON.parse(json))
+    if json.nil?
+      parse({})
+    else
+      parse(JSON.parse(json))
+    end
   end
 
   def self.dump(user)
