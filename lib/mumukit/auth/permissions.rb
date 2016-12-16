@@ -6,7 +6,7 @@ class Mumukit::Auth::Permissions
   def initialize(scopes={})
     raise 'invalid scopes' if scopes.any? { |key, value| value.class != Mumukit::Auth::Scope  }
 
-    @scopes = scopes
+    @scopes = scopes.with_indifferent_access
   end
 
   def has_permission?(role, resource_slug)

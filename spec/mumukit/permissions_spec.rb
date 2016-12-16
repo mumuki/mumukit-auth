@@ -8,6 +8,10 @@ describe Mumukit::Auth::Permissions do
         teacher: Mumukit::Auth::Scope.parse('foo/baz'))
   end
 
+  let(:parsed_permissions) do
+    Mumukit::Auth::Permissions.load(permissions.to_json)
+  end
+
   it { expect(permissions).to json_like Mumukit::Auth::Permissions.parse(student: 'foo/*:test/*',
                                                                          owner: 'test/*',
                                                                          teacher: 'foo/baz') }
@@ -34,6 +38,12 @@ describe Mumukit::Auth::Permissions do
   it { expect(permissions.student? 'foo/student').to be true }
   it { expect(permissions.student? 'baz/student').to be false }
   it { expect(permissions.student? 'baz/_').to be false }
+
+  it { expect(parsed_permissions.student? 'foo/bar').to be true }
+  it { expect(parsed_permissions.student? 'test/student').to be true }
+  it { expect(parsed_permissions.student? 'foo/student').to be true }
+  it { expect(parsed_permissions.student? 'baz/student').to be false }
+  it { expect(parsed_permissions.student? 'baz/_').to be false }
 
   context 'when no permissions' do
     let(:permissions) { Mumukit::Auth::Permissions.parse({}) }
