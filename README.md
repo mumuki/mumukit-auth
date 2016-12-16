@@ -37,15 +37,43 @@ Mumukit::Auth:Slug.parse("hello/world")
 "hello/world".to_mumukit_slug
 Mumukit::Auth:Slug.new('foo', 'bar').to_s
 
-# Matching
+# Comparing
 "hello/world".to_mumukit_slug == "hello/world".to_mumukit_slug
+
+# Matching
 "hello/world".to_mumukit_slug.match_first 'hello'
 "hello/world".to_mumukit_slug.match_second 'world'
 ```
 
 ### Grants
-### Permissions
+
+```ruby
+# Parsing
+Mumukit::Auth::Grant.parse "*"
+Mumukit::Auth::Grant.parse "foo/bar"
+Mumukit::Auth::Grant.parse "foo/*"
+
+# Convertion from and to string
+"foo/*".to_mumukit_grant
+a_grant.to_s
+
+# Comparing
+"*".to_mumukig_grant == "*".to_mumukig_grant 
+
+# Validating
+"foo/*".to_mumukit_grant.allows? 'foo/bar' # true
+"foo/*".to_mumukit_grant.allows? 'goo/bar' # false
+"foo/*".to_mumukit_grant.allows? 'foo/_' # true
+"baz/bar".to_mumukit_grant.allows? 'baz/bar' # true
+"baz/bar".to_mumukit_grant.allows? 'goo/_' # false
+```
+
 ### Roles
+
+```ruby
+Mumukit::Auth::Roles.ROLES # answers [:student, :teacher, :headmaster, :writer, :editor, :janitor, :owner]
+```
+
 ### Token
 
 Tokens are easy-to-use JWT tokens. 
@@ -59,7 +87,8 @@ Mumukit::Auth::Token.decode('eyJh...XVCJ9.eA....X0.yRQ..Xw')
 Mumukit::Auth::Token.decode_header('bearer eyJh...XVCJ9.eA....X0.yRQ..Xw')
 
 # Encoding
-Mumukit::Auth::Token.encode(metadata: {key: value}) # answers a **string**
+Mumukit::Auth::Token.encode(metadata: {key: value}) # answers a jwt **string**
+a_token.encode # answers a jwt **string**
 
 # Verification
 a_token.verify_client!
