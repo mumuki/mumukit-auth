@@ -47,6 +47,12 @@ Mumukit::Auth:Slug.new('foo', 'bar').to_s
 
 ### Grants
 
+Grants are patterns for matching slugs. There are three kind of patterns: 
+
+* _all-patterns_: `*`: they match every slug
+* _first-part-patterns_: `foo/*`: they match slugs whose first part match the grant, the 
+* _exact-match-patterns_: `foo/bar`: they match a single slug
+
 ```ruby
 # Parsing
 Mumukit::Auth::Grant.parse "*"
