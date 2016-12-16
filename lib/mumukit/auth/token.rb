@@ -16,6 +16,10 @@ module Mumukit::Auth
       raise Mumukit::Auth::InvalidTokenError.new('aud mismatch') if Mumukit::Auth.config.client_id != jwt['aud']
     end
 
+    def encode
+      JWT.encode(jwt, self.class.decoded_secret)
+    end
+
     def self.from_rack_env(env)
       new(env.dig('omniauth.auth', 'extra', 'raw_info') || {})
     end
@@ -25,7 +29,7 @@ module Mumukit::Auth
     end
 
     def self.encode(metadata)
-      JWT.encode({aud: Mumukit::Auth.config.client_id, metadata: metadata}, decoded_secret)
+      new(aud: Mumukit::Auth.config.client_id, metadata: metadata).encode
     end
 
     def self.decode(encoded)
