@@ -13,6 +13,10 @@ class Mumukit::Auth::Permissions
     !!scope_for(role)&.allows?(resource_slug)
   end
 
+  def protect!(scope, slug)
+    scope_for(scope)&.protect!(slug)
+  end
+
   def has_role?(role)
     scopes[role].present?
   end
