@@ -12,6 +12,18 @@ module Mumukit::Auth
       @metadata ||= jwt['metadata'] || {}
     end
 
+    def uid
+      @uid ||= jwt['email'] || jwt['sub']
+    end
+
+    def permissions
+      @permissions ||= Mumukit::Auth::Store.new('permissions').safe_get @uid
+    end
+
+    def protect!(scope, resource_slug)
+      permissions.protect! scope, resource_slug
+    end
+
     def verify_client!
       raise Mumukit::Auth::InvalidTokenError.new('aud mismatch') if Mumukit::Auth.config.client_id != jwt['aud']
     end
