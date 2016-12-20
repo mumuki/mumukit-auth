@@ -28,5 +28,15 @@ describe Mumukit::Auth::Token do
       let(:jwt) { {} }
       it { expect(token.metadata).to eq({}) }
     end
+
+    context 'protect' do
+      let(:jwt) { {'sub' => uid} }
+      context 'when social_id' do
+        let(:uid) { 'facebook|1' }
+        before { Mumukit::Auth::Store.from_env.safe_set! uid, {student: 'test/_'} }
+        it { expect { token.protect! :student, 'test/_' }.not_to raise_error }
+        it { expect { token.protect! :teacher, 'example/test' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
+      end
+    end
   end
 end

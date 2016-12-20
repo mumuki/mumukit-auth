@@ -1,6 +1,10 @@
 module Mumukit::Auth
   class Store
 
+    def self.from_env
+      new ENV['MUMUKI_DAYBREAK_NAME']
+    end
+
     def initialize(db_name)
       @db = Daybreak::DB.new "#{db_name}.db", default: '{}'
     end

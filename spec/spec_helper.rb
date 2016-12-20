@@ -31,6 +31,6 @@ end
 
 Rspec.configure do |config|
   config.after(:each) do
-    FileUtils.rm ['test.db'], force: true
+    FileUtils.rm ["#{ENV['MUMUKI_DAYBREAK_NAME']}.db"], force: true
   end
 end
