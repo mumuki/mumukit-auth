@@ -7,7 +7,7 @@ module Mumukit::Auth
     end
 
     def protect!(resource_slug)
-      raise Mumukit::Auth::UnauthorizedAccessError.with_message(resource_slug, to_s) unless allows?(resource_slug)
+      raise Mumukit::Auth::UnauthorizedAccessError.with_message(resource_slug, self) unless allows?(resource_slug)
     end
 
     def allows?(resource_slug)
