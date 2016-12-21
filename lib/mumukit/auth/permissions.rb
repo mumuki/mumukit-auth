@@ -15,8 +15,6 @@ class Mumukit::Auth::Permissions
 
   def protect!(scope, slug)
     scope_for(scope).protect!(slug)
-  rescue NoMethodError => _
-    raise Mumukit::Auth::UnauthorizedAccessError.with_message(slug, scope_for(scope))
   end
 
   def has_role?(role)
@@ -24,7 +22,7 @@ class Mumukit::Auth::Permissions
   end
 
   def scope_for(role)
-    self.scopes[role]
+    self.scopes[role] || Mumukit::Auth::Scope.new
   end
 
   def add_permission!(role, *grants)
