@@ -2,7 +2,7 @@ module Mumukit::Auth
   class Store
 
     def self.from_env
-      new ENV['MUMUKI_DAYBREAK_NAME']
+      new Mumukit::Auth.config.daybreak_name
     end
 
     def initialize(db_name)

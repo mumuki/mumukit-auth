@@ -6,6 +6,7 @@ require 'base64'
 Mumukit::Auth.configure do |c|
   c.client_id = 'foo'
   c.client_secret = Base64.encode64 'bar'
+  c.daybreak_name = ENV['MUMUKI_DAYBREAK_NAME'] || 'test.db'
 end
 
 RSpec::Matchers.define :json_like do |expected, options={}|
@@ -31,6 +32,6 @@ end
 
 Rspec.configure do |config|
   config.after(:each) do
-    FileUtils.rm ["#{ENV['MUMUKI_DAYBREAK_NAME']}.db"], force: true
+    FileUtils.rm ["#{Mumukit::Auth.config.daybreak_name}.db"], force: true
   end
 end
