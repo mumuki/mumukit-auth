@@ -4,13 +4,17 @@ class Mumukit::Auth::Permissions
   attr_accessor :scopes
 
   def initialize(scopes={})
-    raise 'invalid scopes' if scopes.any? { |key, value| value.class.is_a? Mumukit::Auth::Scope  }
+    raise 'invalid scopes' if scopes.any? { |key, value| value.class != Mumukit::Auth::Scope }
 
     @scopes = scopes.with_indifferent_access
   end
 
   def has_permission?(role, resource_slug)
-    !!scope_for(role)&.allows?(resource_slug) || parent_scope_for(role).present? && has_permission?(parent_scope_for(role), resource_slug)
+    Mumukit::Auth::Role.parse(role).allows?(resource_slug, self)
+  end
+
+  def role_allows?(role, resource_slug)
+    scope_for(role).allows?(resource_slug)
   end
 
   def protect!(scope, slug)
@@ -21,16 +25,12 @@ class Mumukit::Auth::Permissions
     scopes[role].present?
   end
 
-  def scope_for(role)
-    self.scopes[role] || Mumukit::Auth::Scope.parse(role)
-  end
 
-  def parent_scope_for(role)
-    Mumukit::Auth::Scope.parse(role).parent
+  def scope_for(role)
+    self.scopes[role] ||= Mumukit::Auth::Scope.new
   end
 
   def add_permission!(role, *grants)
-    self.scopes[role] ||= Mumukit::Auth::Scope.parse(role)
     scope_for(role)&.add_grant! *grants
   end
 
@@ -48,7 +48,7 @@ class Mumukit::Auth::Permissions
   end
 
   def self.parse(hash)
-    new(Hash[hash.map { |role, grants| [role, Mumukit::Auth::Scope.parse(role, grants)] }])
+    new(Hash[hash.map { |role, grants| [role, Mumukit::Auth::Scope.parse(grants)] }])
   end
 
   def self.load(json)

@@ -31,12 +31,8 @@ module Mumukit::Auth
       to_s.present?
     end
 
-    def self.parse_scope(role)
-      "Mumukit::Auth::#{role.to_s.camelize}Scope".constantize
-    end
-
-    def self.parse(role, string='')
-      parse_scope(role).new(string.split(':').map(&:to_mumukit_grant))
+    def self.parse(string='')
+      new(string.split(':').map(&:to_mumukit_grant))
     end
 
     def as_json(_options={})
@@ -47,41 +43,6 @@ module Mumukit::Auth
 
     def any_grant?(&block)
       @grants.any?(&block)
-    end
-  end
-
-  class StudentScope < Scope
-    def parent
-      :owner
-    end
-  end
-  class TeacherScope < Scope
-    def parent
-      :headmaster
-    end
-  end
-  class HeadmasterScope < Scope
-    def parent
-      :owner
-    end
-  end
-  class WriterScope < Scope
-    def parent
-      :editor
-    end
-  end
-  class EditorScope < Scope
-    def parent
-      :owner
-    end
-  end
-  class JanitorScope < Scope
-    def parent
-      :owner
-    end
-  end
-  class OwnerScope < Scope
-    def parent
     end
   end
 end

@@ -3,6 +3,7 @@ require 'mumukit/core'
 require 'daybreak'
 
 require_relative './auth/array'
+require_relative './auth/role'
 require_relative './auth/roles'
 require_relative './auth/slug'
 require_relative './auth/version'
