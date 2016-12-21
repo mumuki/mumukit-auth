@@ -3,9 +3,9 @@ require 'spec_helper'
 describe Mumukit::Auth::Permissions do
   let(:permissions) do
     Mumukit::Auth::Permissions.new(
-        student: Mumukit::Auth::Scope.parse('foo/*:test/*'),
-        owner: Mumukit::Auth::Scope.parse('test/*'),
-        teacher: Mumukit::Auth::Scope.parse('foo/baz'))
+        student: Mumukit::Auth::Scope.parse(:student, 'foo/*:test/*'),
+        owner: Mumukit::Auth::Scope.parse(:owner, 'test/*'),
+        teacher: Mumukit::Auth::Scope.parse(:teacher,'foo/baz'))
   end
 
   let(:parsed_permissions) do
@@ -30,8 +30,8 @@ describe Mumukit::Auth::Permissions do
   it { expect(permissions.owner? 'test/student').to be true }
   it { expect(permissions.owner? 'test/_').to be true }
 
-  it { expect(permissions.writer? 'test/student').to be false }
-  it { expect(permissions.writer? 'test/_').to be false }
+  it { expect(permissions.writer? 'test/student').to be true }
+  it { expect(permissions.writer? 'test/_').to be true }
 
   it { expect(permissions.student? 'foo/bar').to be true }
   it { expect(permissions.student? 'test/student').to be true }
@@ -99,6 +99,21 @@ describe Mumukit::Auth::Permissions do
       it { expect(permissions.student? 'foo/bar').to eq true }
       it { expect(permissions.student? 'foo/baz').to eq true }
     end
+  end
+
+  context 'permissions hierarchy' do
+    let(:permissions) do
+      Mumukit::Auth::Permissions.new(
+          headmaster: Mumukit::Auth::Scope.parse(:headmaster, 'foo/*'),
+          owner: Mumukit::Auth::Scope.parse(:owner, 'test/*'))
+    end
+    it { expect(permissions.student? 'test/*').to eq true }
+    it { expect(permissions.teacher? 'foo/bar').to eq true }
+    it { expect(permissions.headmaster? 'foo/baz').to eq true }
+    it { expect(permissions.headmaster? 'bar/baz').to eq false }
+    it { expect(permissions.headmaster? 'test/baz').to eq true }
+    it { expect(permissions.owner? 'test/baz').to eq true }
+
   end
 
 end
