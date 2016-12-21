@@ -1,27 +1,5 @@
 module Mumukit::Auth
   class Store
-
-    class << self
-      def from_env
-        new Mumukit::Auth.config.daybreak_name
-      end
-
-      def with(&block)
-        store = from_env
-        block.call store
-        ensure
-          store.close
-      end
-
-      def set!(*args)
-        with { |store| store.set!(*args) }
-      end
-
-      def get(key)
-        with { |store| store.get(key) }
-      end
-    end
-
     def initialize(db_name)
       @db = Daybreak::DB.new "#{db_name}.db", default: '{}'
     end
@@ -36,6 +14,27 @@ module Mumukit::Auth
 
     def get(key)
       Mumukit::Auth::Permissions.load @db[key]
+    end
+
+    class << self
+      def from_env
+        new Mumukit::Auth.config.daybreak_name
+      end
+
+      def with(&block)
+        store = from_env
+        block.call store
+      ensure
+        store.close
+      end
+
+      def set!(*args)
+        with { |store| store.set!(*args) }
+      end
+
+      def get(key)
+        with { |store| store.get(key) }
+      end
     end
   end
 end
