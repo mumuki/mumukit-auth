@@ -14,7 +14,7 @@ class Mumukit::Auth::Permissions
   end
 
   def protect!(scope, slug)
-    scope_for(scope)&.protect!(slug)
+    scope_for(scope).protect!(slug)
   end
 
   def has_role?(role)
@@ -22,7 +22,7 @@ class Mumukit::Auth::Permissions
   end
 
   def scope_for(role)
-    self.scopes[role]
+    self.scopes[role] || Mumukit::Auth::Scope.new
   end
 
   def add_permission!(role, *grants)

@@ -7,7 +7,7 @@ module Mumukit::Auth
     end
 
     def protect!(resource_slug)
-      raise Mumukit::Auth::UnauthorizedAccessError.new(unauthorized_message(resource_slug)) unless allows?(resource_slug)
+      raise Mumukit::Auth::UnauthorizedAccessError.with_message(resource_slug, self) unless allows?(resource_slug)
     end
 
     def allows?(resource_slug)
@@ -43,10 +43,6 @@ module Mumukit::Auth
 
     def any_grant?(&block)
       @grants.any?(&block)
-    end
-
-    def unauthorized_message(slug)
-      "Unauthorized access to #{slug}. Permissions are #{to_s}"
     end
   end
 end
