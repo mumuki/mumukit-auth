@@ -17,7 +17,7 @@ module Mumukit::Auth
     end
 
     def permissions
-      @permissions ||= Mumukit::Auth::Store.from_env.safe_get uid
+      @permissions ||= Mumukit::Auth::Store.get uid
     end
 
     def protect!(scope, resource_slug)
