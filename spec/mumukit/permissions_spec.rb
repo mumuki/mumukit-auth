@@ -47,6 +47,8 @@ describe Mumukit::Auth::Permissions do
 
   it { expect { parsed_permissions.protect! :student, 'baz/_' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
   it { expect { parsed_permissions.protect! :student, 'foo/student' }.not_to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
+  it { expect { parsed_permissions.protect! :writer, 'foo/student' }.not_to raise_error(NoMethodError) }
+  it { expect { parsed_permissions.protect! :writer, 'foo/student' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
 
   context 'when no permissions' do
     let(:permissions) { Mumukit::Auth::Permissions.parse({}) }
