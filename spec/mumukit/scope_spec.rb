@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe Mumukit::Auth::Scope do
   describe 'one grant' do
-    let(:scope) { Mumukit::Auth::Scope.parse('*') }
+    let(:scope) { Mumukit::Auth::Scope.parse(:student, '*') }
 
     it { expect(scope.allows? 'foo/bar').to be true }
   end
 
   describe 'two scope' do
-    let(:scope) { Mumukit::Auth::Scope.parse('foo/*:mumuki/*') }
+    let(:scope) { Mumukit::Auth::Scope.parse(:student, 'foo/*:mumuki/*') }
 
     it { expect(scope.allows? 'foo/bag').to be true }
     it { expect(scope.allows? 'foo/baz').to be true }
@@ -22,7 +22,7 @@ describe Mumukit::Auth::Scope do
   end
 
   describe 'grant none' do
-    let(:scope) { Mumukit::Auth::Scope.parse('') }
+    let(:scope) { Mumukit::Auth::Scope.parse(:student) }
 
     it { expect(scope.allows? 'foo/bag').to be false }
     it { expect(scope.allows? 'fooz/baz').to be false }
