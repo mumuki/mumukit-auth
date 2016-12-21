@@ -31,7 +31,7 @@ module Mumukit::Auth
       to_s.present?
     end
 
-    def self.parse(string)
+    def self.parse(string='')
       new(string.split(':').map(&:to_mumukit_grant))
     end
 
