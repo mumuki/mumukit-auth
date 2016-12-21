@@ -5,7 +5,8 @@ module Mumukit::Auth
     end
 
     def allows?(resource_slug, permissions)
-      !!permissions.role_allows?(to_sym, resource_slug) || parent_allows?(resource_slug, permissions)
+      permissions.role_allows?(to_sym, resource_slug) ||
+          parent_allows?(resource_slug, permissions)
     end
 
     def parent_allows?(resource_slug, permissions)
