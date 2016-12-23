@@ -64,7 +64,7 @@ Mumukit::Auth::Grant.parse "foo/*"
 a_grant.to_s
 
 # Comparing
-"*".to_mumukig_grant == "*".to_mumukig_grant
+"*".to_mumukit_grant == "*".to_mumukit_grant
 
 # Validating
 "foo/*".to_mumukit_grant.allows? 'foo/bar' # true
