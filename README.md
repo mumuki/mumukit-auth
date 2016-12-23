@@ -12,7 +12,20 @@
 
 ### Slugs
 
-Slugs are identifier composed of up to two parts, separated by a slash, similar to Github's or DockerHub's slugs.
+Slugs are identifier composed of two parts, separated by a slash, similar to Github's or DockerHub's slugs. For example:
+
+* `mumuki/mumukit-auth`: the first part is `mumuki` and the last part is `mumukit-auth`
+* `my-university/course-101`
+
+There are common use cases within Mumuki:
+
+* the first may represent the _organization_
+* the second may represents a _repository_, a _course_ or a _content_
+
+Parts are simple identifiers that can be contain alphanumeric ASCII characters, dashes or numbers. There are also two _special identifiers_:
+
+* The match-all wildcard `*`
+* The match-any wildcard `_`
 
 Usage:
 
@@ -50,7 +63,7 @@ Mumukit::Auth:Slug.new('foo', 'bar').to_s
 Grants are patterns for matching slugs. There are three kind of patterns:
 
 * _all-patterns_: `*`: they match every slug
-* _first-part-patterns_: `foo/*`: they match slugs whose first part match the grant, the
+* _first-part-patterns_: `foo/*`: they match slugs whose first part match the grant
 * _exact-match-patterns_: `foo/bar`: they match a single slug
 
 ```ruby
@@ -64,7 +77,7 @@ Mumukit::Auth::Grant.parse "foo/*"
 a_grant.to_s
 
 # Comparing
-"*".to_mumukig_grant == "*".to_mumukig_grant
+"*".to_mumukit_grant == "*".to_mumukit_grant
 
 # Validating
 "foo/*".to_mumukit_grant.allows? 'foo/bar' # true

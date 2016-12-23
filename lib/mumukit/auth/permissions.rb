@@ -25,7 +25,6 @@ class Mumukit::Auth::Permissions
     scopes[role].present?
   end
 
-
   def scope_for(role)
     self.scopes[role] ||= Mumukit::Auth::Scope.new
   end
@@ -41,6 +40,10 @@ class Mumukit::Auth::Permissions
   def update_permission!(role, old_grant, new_grant)
     remove_permission! role, old_grant
     add_permission! role, new_grant
+  end
+
+  def delegate_to?(other)
+    other.scopes.all? { |role, scope| scope.grants.all? { |grant| has_permission? role, grant } }
   end
 
   def as_json(options={})
@@ -59,8 +62,8 @@ class Mumukit::Auth::Permissions
     end
   end
 
-  def self.dump(user)
-    user.to_json
+  def self.dump(permission)
+    permission.to_json
   end
 
 end

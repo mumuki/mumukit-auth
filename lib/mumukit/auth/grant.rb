@@ -39,6 +39,10 @@ module Mumukit::Auth
     def to_s
       '*'
     end
+
+    def to_mumukit_slug
+      Mumukit::Auth::Slug.new '*', '*'
+    end
   end
 
   class FirstPartGrant < Grant
@@ -52,6 +56,10 @@ module Mumukit::Auth
 
     def to_s
       "#{@first}/*"
+    end
+
+    def to_mumukit_slug
+      Mumukit::Auth::Slug.new @first, '*'
     end
   end
 
@@ -67,6 +75,10 @@ module Mumukit::Auth
 
     def to_s
       @slug.to_s
+    end
+
+    def to_mumukit_slug
+      @slug
     end
   end
 end
