@@ -12,9 +12,9 @@
 
 ### Slugs
 
-Slugs are identifier composed of up to two parts, separated by a slash, similar to Github's or DockerHub's slugs. 
+Slugs are identifier composed of up to two parts, separated by a slash, similar to Github's or DockerHub's slugs.
 
-Usage: 
+Usage:
 
 ```ruby
 
@@ -25,10 +25,10 @@ Mumukit::Auth:Slug.from_options(organization: 'hello', repository: 'world')
 
 Mumukit::Auth:Slug.join('first', 'second')
 Mumukit::Auth:Slug.join(first: 'first', second: 'second')
-Mumukit::Auth:Slug.join('first') # answers the slug 'first/_' 
+Mumukit::Auth:Slug.join('first') # answers the slug 'first/_'
 
-Mumukit::Auth:Slug.join_s('first', 'second') # answers the string 'first/second' 
-Mumukit::Auth:Slug.join_s('first') # answers the string 'first/_' 
+Mumukit::Auth:Slug.join_s('first', 'second') # answers the string 'first/second'
+Mumukit::Auth:Slug.join_s('first') # answers the string 'first/_'
 
 # Parsing
 Mumukit::Auth:Slug.parse("hello/world")
@@ -47,10 +47,10 @@ Mumukit::Auth:Slug.new('foo', 'bar').to_s
 
 ### Grants
 
-Grants are patterns for matching slugs. There are three kind of patterns: 
+Grants are patterns for matching slugs. There are three kind of patterns:
 
 * _all-patterns_: `*`: they match every slug
-* _first-part-patterns_: `foo/*`: they match slugs whose first part match the grant, the 
+* _first-part-patterns_: `foo/*`: they match slugs whose first part match the grant, the
 * _exact-match-patterns_: `foo/bar`: they match a single slug
 
 ```ruby
@@ -64,7 +64,7 @@ Mumukit::Auth::Grant.parse "foo/*"
 a_grant.to_s
 
 # Comparing
-"*".to_mumukig_grant == "*".to_mumukig_grant 
+"*".to_mumukig_grant == "*".to_mumukig_grant
 
 # Validating
 "foo/*".to_mumukit_grant.allows? 'foo/bar' # true
@@ -72,6 +72,7 @@ a_grant.to_s
 "foo/*".to_mumukit_grant.allows? 'foo/_' # true
 "baz/bar".to_mumukit_grant.allows? 'baz/bar' # true
 "baz/bar".to_mumukit_grant.allows? 'goo/_' # false
+"baz/bar".to_mumukit_grant.allows? Mumukit::Auth::Slug.join('foo') # false
 ```
 
 ### Roles
@@ -80,13 +81,51 @@ a_grant.to_s
 Mumukit::Auth::Roles.ROLES # answers [:student, :teacher, :headmaster, :writer, :editor, :janitor, :owner]
 ```
 
-### Token
+### Permissions
 
-Tokens are easy-to-use JWT tokens. 
+`Mumukit::Auth::Permissions` is a set of specifications of what a user can do. Each permissions is a pair role-scope, for example:
+
+```
+       writer => foo/*:bar/baz
+role-->^^^^^           ^^^^^^<---- grant
+                 ^^^^^^^^^^^^<---- scope
+       ^^^^^^^^^^^^^^^^^^^^^^<---- permission
+```
+
+The simplest way of instantiating the previous permissions is the following:
+
+```ruby
+Mumuki::Auth::Permissions.parse(writer: 'foo/*:bar/baz')
+```
+
+You can use `Mumukit::Auth::Permissions` the following way:
+
+```ruby
+# Manage permissions
+some_permissions.add_permission! :owner, 'foo/*'
+some_permissions.add_permission! :owner, 'foo/*', 'bar/*' # it accepts multiple permissions
+some_permissions.remove_permission! :student, 'foo/bar'
+some_permissions.update_permission! :student, 'foo/*', 'foo/bar'
+
+# Checking permissions
+some_permissions.has_permission? :student, 'foo/_'
+some_permissions.student? 'foo/_' # equivalent to previous line
+some_permissions.protect! :student, 'foo/_' # similar to previous samples,
+                                            # but raises and exception instead
+                                            # of returning a boolean
+
+# Converting from and to json
+some_permissions.to_json
+Mumuki::Auth::Permissions.load('"writer": "foo/*:bar/baz"')
+```
+
+### Tokens
+
+Tokens are easy-to-use JWT tokens.
 
 ```ruby
 # Creating
-Mumukit::Auth::Token.new metadata: {key: value}, iss: '...', aud: '...'  
+Mumukit::Auth::Token.new metadata: {key: value}, iss: '...', aud: '...'
 
 # Decoding
 Mumukit::Auth::Token.decode('eyJh...XVCJ9.eA....X0.yRQ..Xw')
