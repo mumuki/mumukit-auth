@@ -62,8 +62,8 @@ class Mumukit::Auth::Permissions
     end
   end
 
-  def self.dump(user)
-    user.to_json
+  def self.dump(permission)
+    permission.to_json
   end
 
 end
