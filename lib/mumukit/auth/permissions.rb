@@ -43,7 +43,7 @@ class Mumukit::Auth::Permissions
   end
 
   def delegate_to?(other)
-    other.scopes.all? { |role, scope| scope.grants.all? { |grant| has_permission? role, grant } }
+    other.scopes.all? { |role, scope| has_all_permissions?(role, scope) }
   end
 
   def as_json(options={})
@@ -64,6 +64,12 @@ class Mumukit::Auth::Permissions
 
   def self.dump(permission)
     permission.to_json
+  end
+
+  private
+
+  def has_all_permissions?(role, scope)
+    scope.grants.all? { |grant| has_permission? role, grant }
   end
 
 end
