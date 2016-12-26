@@ -98,6 +98,10 @@ describe Mumukit::Auth::Permissions do
     it { expect { parsed_permissions.protect! :teacher, 'bar/_' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
   end
 
+  describe '#grants_for' do
+    it { expect(Mumukit::Auth::Permissions.parse(student: 'foo/bar:baz/goo').grant_strings_for :student).to eq ['foo/bar', 'baz/goo'] }
+  end
+
   describe 'add_scope!' do
     let(:permissions) { parse_permissions({}) }
     context 'when no teacher permissions added' do

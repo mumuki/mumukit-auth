@@ -50,6 +50,10 @@ class Mumukit::Auth::Permissions
     other.scopes.all? { |role, scope| has_all_permissions?(role, scope) }
   end
 
+  def grant_strings_for(role)
+    scope_for(role).grants.map(&:to_s)
+  end
+
   def as_json(options={})
     scopes.as_json(options)
   end
