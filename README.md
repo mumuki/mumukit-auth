@@ -130,6 +130,11 @@ some_permissions.protect! :student, 'foo/_' # similar to previous samples,
 # Converting from and to json
 some_permissions.to_json
 Mumuki::Auth::Permissions.load('"writer": "foo/*:bar/baz"')
+
+# Merging Permissions
+permissions_1 = Mumukit::Auth::Permissions.parse(student: 'foo/*', teacher: 'foo/baz', owner: 'foobar/baz')
+permissions_2 = Mumukit::Auth::Permissions.parse(student: 'foo/baz', teacher: 'foo/*', owner: 'bar/baz')
+permissions_1.merge(permissions_2).as_json # {student: 'foo/*', teacher: 'foo/*', owner: 'foobar/baz:bar/baz' }
 ```
 
 ### Tokens
