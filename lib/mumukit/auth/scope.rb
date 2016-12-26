@@ -7,10 +7,6 @@ module Mumukit::Auth
       add_grant! *grants
     end
 
-    def protect!(resource_slug)
-      raise Mumukit::Auth::UnauthorizedAccessError.with_message(resource_slug, self) unless allows?(resource_slug)
-    end
-
     def allows?(resource_slug)
       any_grant? { |grant| grant.allows? resource_slug }
     end
