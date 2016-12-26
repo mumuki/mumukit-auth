@@ -52,9 +52,17 @@ module Mumukit::Auth
 
     def push_and_compact!(grant)
       grant = grant.to_mumukit_grant
-      return if grants.any? { |it| it.allows? grant }
-      grants.reject! { |it| grant.allows? it }
+      return if has_broader_grant? grant
+      remove_narrower_grants! grant
       grants << grant
+    end
+
+    def remove_narrower_grants!(grant)
+      grants.reject! { |it| grant.allows? it }
+    end
+
+    def has_broader_grant?(grant)
+      grants.any? { |it| it.allows? grant }
     end
   end
 end
