@@ -1,5 +1,9 @@
 require 'spec_helper'
 
+def parse_permissions(hash)
+  Mumukit::Auth::Permissions.parse hash
+end
+
 describe Mumukit::Auth::Permissions do
   let(:permissions) do
     Mumukit::Auth::Permissions.new(
@@ -8,30 +12,40 @@ describe Mumukit::Auth::Permissions do
         teacher: Mumukit::Auth::Scope.parse('foo/baz'))
   end
 
+  describe '#merge' do
+    it { expect(Mumukit::Auth::Permissions.new.merge(Mumukit::Auth::Permissions.new)).to json_like({}) }
+    it { expect(permissions.merge(Mumukit::Auth::Permissions.new)).to json_like permissions }
+    it { expect(Mumukit::Auth::Permissions.new.merge(permissions)).to json_like(permissions) }
+    it { expect(permissions.merge(permissions)).to json_like(permissions) }
+    it { expect(parse_permissions(student: 'foo/bar').merge(parse_permissions(student: 'foo/baz'))).to json_like student: 'foo/bar:foo/baz' }
+    it { expect(parse_permissions(student: 'foo/bar').merge(parse_permissions(student: 'foo/*'))).to json_like student: 'foo/*' }
+
+  end
+
   describe '#delegate_to?' do
     let(:permissions) do
-      Mumukit::Auth::Permissions.parse(student: 'foo/*', teacher: 'foo/baz', headmaster: '*')
+      parse_permissions(student: 'foo/*', teacher: 'foo/baz', headmaster: '*')
     end
 
 
     it { expect(permissions.delegate_to? Mumukit::Auth::Permissions.new).to be true }
-    it { expect(permissions.delegate_to? Mumukit::Auth::Permissions.parse(owner: 'foo/*')).to be false }
-    it { expect(permissions.delegate_to? Mumukit::Auth::Permissions.parse(student: 'foo/*')).to be true }
-    it { expect(permissions.delegate_to? Mumukit::Auth::Permissions.parse(student: 'foo/bar')).to be true }
-    it { expect(permissions.delegate_to? Mumukit::Auth::Permissions.parse(student: 'bar/*')).to be false }
-    it { expect(permissions.delegate_to? Mumukit::Auth::Permissions.parse(student: '*')).to be false }
-    it { expect(permissions.delegate_to? Mumukit::Auth::Permissions.parse(writer: '*')).to be false }
-    it { expect(permissions.delegate_to? Mumukit::Auth::Permissions.parse(headmaster: 'foo/bar')).to be true }
-    it { expect(permissions.delegate_to? Mumukit::Auth::Permissions.parse(headmaster: 'foo/*')).to be true }
+    it { expect(permissions.delegate_to? parse_permissions(owner: 'foo/*')).to be false }
+    it { expect(permissions.delegate_to? parse_permissions(student: 'foo/*')).to be true }
+    it { expect(permissions.delegate_to? parse_permissions(student: 'foo/bar')).to be true }
+    it { expect(permissions.delegate_to? parse_permissions(student: 'bar/*')).to be false }
+    it { expect(permissions.delegate_to? parse_permissions(student: '*')).to be false }
+    it { expect(permissions.delegate_to? parse_permissions(writer: '*')).to be false }
+    it { expect(permissions.delegate_to? parse_permissions(headmaster: 'foo/bar')).to be true }
+    it { expect(permissions.delegate_to? parse_permissions(headmaster: 'foo/*')).to be true }
   end
 
   describe 'parsing' do
-    it { expect(permissions).to json_like Mumukit::Auth::Permissions.parse(student: 'foo/*:test/*',
-                                                                           owner: 'test/*',
-                                                                           teacher: 'foo/baz') }
-    it { expect(permissions).to json_like Mumukit::Auth::Permissions.parse('student' => 'foo/*:test/*',
-                                                                           'owner' => 'test/*',
-                                                                           'teacher' => 'foo/baz') }
+    it { expect(permissions).to json_like parse_permissions(student: 'foo/*:test/*',
+                                                            owner: 'test/*',
+                                                            teacher: 'foo/baz') }
+    it { expect(permissions).to json_like parse_permissions('student' => 'foo/*:test/*',
+                                                            'owner' => 'test/*',
+                                                            'teacher' => 'foo/baz') }
   end
 
   describe 'checking' do
@@ -72,35 +86,52 @@ describe Mumukit::Auth::Permissions do
     it { expect { parsed_permissions.protect! :student, 'foo/student' }.not_to raise_error }
     it { expect { parsed_permissions.protect! :writer, 'foo/student' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
   end
-  context 'when no permissions' do
-    let(:permissions) { Mumukit::Auth::Permissions.parse({}) }
 
-    before { permissions.add_permission! :student, 'test/*' }
+  describe 'add_scope!' do
+    let(:permissions) { parse_permissions({}) }
+    context 'when no teacher permissions added' do
+      before { permissions.add_permission!(:teacher, 'test/bar') }
 
-    it { expect(permissions.as_json).to json_like(student: 'test/*') }
-    it { expect(permissions.has_permission? :student, 'test/baz').to be true }
-    it { expect(permissions.has_role? :student).to be true }
-  end
-
-  context 'add_scope!' do
-    let(:permissions) { Mumukit::Auth::Permissions.parse(student: 'foo/bar') }
-    context 'when no permissions added' do
-      before { permissions.add_permission!(:teacher, 'test/*') }
-
+      it { expect(permissions.has_role? :student).to be false }
       it { expect(permissions.has_role? :teacher).to eq true }
-      it { expect(permissions.teacher? 'test/*').to eq true }
+
+      it { expect(permissions.teacher? 'test/bar').to eq true }
+
+      it { expect(permissions.has_permission? :teacher, 'test/bar').to be true }
+      it { expect(permissions.has_permission? :teacher, 'test/baz').to be false }
+
+      it { expect(permissions.as_json).to json_like(teacher: 'test/bar') }
+
+      context 'when added broader grant' do
+        before { permissions.add_permission! :teacher, 'test/*' }
+
+        it { expect(permissions).to json_like teacher: 'test/*' }
+        it { expect(permissions.has_permission? :teacher, 'test/baz').to be true }
+      end
 
     end
-    context 'when no permissions added' do
+    context 'when no student permissions added' do
       before { permissions.add_permission!(:student, 'test/*') }
 
       it { expect(permissions.has_role? :student).to eq true }
       it { expect(permissions.student? 'test/*').to eq true }
+
+      context 'when added twice' do
+        before { permissions.add_permission! :student, 'test/*' }
+
+        it { expect(permissions).to json_like student: 'test/*' }
+      end
+
+      context 'when added narrower grant' do
+        before { permissions.add_permission! :student, 'test/foo' }
+
+        it { expect(permissions).to json_like student: 'test/*' }
+      end
     end
   end
 
   context 'remove_scope!' do
-    let(:permissions) { Mumukit::Auth::Permissions.parse(student: 'foo/bar:test/*:foo/baz') }
+    let(:permissions) { parse_permissions(student: 'foo/bar:test/*:foo/baz') }
 
     context 'when permission is present' do
       before { permissions.remove_permission!(:student, 'test/*') }

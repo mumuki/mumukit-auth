@@ -33,6 +33,10 @@ class Mumukit::Auth::Permissions
     scope_for(role).add_grant! *grants
   end
 
+  def merge(other)
+    self.class.new(scopes.merge(other.scopes) { |_key, left, right| left.merge right})
+  end
+
   def remove_permission!(role, grant)
     scope_for(role).remove_grant!(grant)
   end
