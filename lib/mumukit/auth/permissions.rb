@@ -30,11 +30,11 @@ class Mumukit::Auth::Permissions
   end
 
   def add_permission!(role, *grants)
-    scope_for(role)&.add_grant! *grants
+    scope_for(role).add_grant! *grants
   end
 
   def remove_permission!(role, grant)
-    scope_for(role)&.remove_grant!(grant)
+    scope_for(role).remove_grant!(grant)
   end
 
   def update_permission!(role, old_grant, new_grant)
