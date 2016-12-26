@@ -27,7 +27,7 @@ describe Mumukit::Auth::Permissions do
 
   describe '#delegate_to?' do
     let(:permissions) do
-      parse_permissions(student: 'foo/*', teacher: 'foo/baz', headmaster: '*')
+      parse_permissions(student: 'foo/*', teacher: 'foo/baz:test/foo', headmaster: '*', janitor: 'test/bar')
     end
 
 
@@ -35,11 +35,16 @@ describe Mumukit::Auth::Permissions do
     it { expect(permissions.delegate_to? parse_permissions(owner: 'foo/*')).to be false }
     it { expect(permissions.delegate_to? parse_permissions(student: 'foo/*')).to be true }
     it { expect(permissions.delegate_to? parse_permissions(student: 'foo/bar')).to be true }
-    it { expect(permissions.delegate_to? parse_permissions(student: 'bar/*')).to be false }
-    it { expect(permissions.delegate_to? parse_permissions(student: '*')).to be false }
+    it { expect(permissions.delegate_to? parse_permissions(student: 'bar/*')).to be true }
+    it { expect(permissions.delegate_to? parse_permissions(student: '*')).to be true }
     it { expect(permissions.delegate_to? parse_permissions(writer: '*')).to be false }
     it { expect(permissions.delegate_to? parse_permissions(headmaster: 'foo/bar')).to be true }
     it { expect(permissions.delegate_to? parse_permissions(headmaster: 'foo/*')).to be true }
+
+
+    it { expect(permissions.delegate_to? parse_permissions(student: 'test/foo')).to be true }
+    it { expect(permissions.delegate_to? parse_permissions(teacher: 'test/bar')).to be true }
+    it { expect(permissions.delegate_to? parse_permissions(headmaster: 'test/bar')).to be true }
   end
 
   describe 'parsing' do

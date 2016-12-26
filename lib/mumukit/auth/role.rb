@@ -29,13 +29,13 @@ module Mumukit::Auth
     end
 
     class Student < Role
-      parent :owner
+      parent :teacher
     end
     class Teacher < Role
       parent :headmaster
     end
     class Headmaster < Role
-      parent :owner
+      parent :janitor
     end
     class Writer < Role
       parent :editor
