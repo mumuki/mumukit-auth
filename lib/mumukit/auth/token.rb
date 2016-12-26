@@ -51,8 +51,12 @@ module Mumukit::Auth
     end
 
     def self.decode_header(header)
+      decode extract_from_header header
+    end
+
+    def self.extract_from_header(header)
       raise Mumukit::Auth::InvalidTokenError.new('missing authorization header') if header.nil?
-      decode header.split(' ').last
+      header.split(' ').last
     end
 
     def self.decoded_secret
