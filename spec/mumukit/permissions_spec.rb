@@ -17,9 +17,12 @@ describe Mumukit::Auth::Permissions do
     it { expect(permissions.merge(Mumukit::Auth::Permissions.new)).to json_like permissions }
     it { expect(Mumukit::Auth::Permissions.new.merge(permissions)).to json_like(permissions) }
     it { expect(permissions.merge(permissions)).to json_like(permissions) }
-    it { expect(parse_permissions(student: 'foo/bar').merge(parse_permissions(student: 'foo/baz'))).to json_like student: 'foo/bar:foo/baz' }
-    it { expect(parse_permissions(student: 'foo/bar').merge(parse_permissions(student: 'foo/*'))).to json_like student: 'foo/*' }
 
+    it do
+      permissions_1 = parse_permissions student: 'foo/*', teacher: 'foo/baz', owner: 'foobar/baz'
+      permissions_2 = parse_permissions student: 'foo/baz', teacher: 'foo/*', owner: 'bar/baz'
+      expect(permissions_1.merge(permissions_2)).to json_like student: 'foo/*', teacher: 'foo/*', owner: 'foobar/baz:bar/baz'
+    end
   end
 
   describe '#delegate_to?' do
