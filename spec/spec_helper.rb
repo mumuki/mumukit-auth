@@ -32,6 +32,6 @@ end
 
 RSpec.configure do |config|
   config.after(:each) do
-    FileUtils.rm ["#{Mumukit::Auth.config.daybreak_name}.db"], force: true
+    Mumukit::Auth::Store.clean_env!
   end
 end

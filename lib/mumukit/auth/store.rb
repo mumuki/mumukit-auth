@@ -21,6 +21,10 @@ module Mumukit::Auth
         new Mumukit::Auth.config.daybreak_name
       end
 
+      def clean_env!
+        FileUtils.rm ["#{Mumukit::Auth.config.daybreak_name}.db"], force: true
+      end
+
       def with(&block)
         store = from_env
         block.call store
