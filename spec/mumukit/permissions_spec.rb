@@ -96,6 +96,7 @@ describe Mumukit::Auth::Permissions do
     it { expect { parsed_permissions.protect! :teacher, 'test/_' }.not_to raise_error }
     it { expect { parsed_permissions.protect! :teacher, 'foo/_' }.not_to raise_error }
     it { expect { parsed_permissions.protect! :teacher, 'bar/_' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
+    it { expect { parsed_permissions.protect! :teacher, 'bar/_' }.to raise_error('Unauthorized access to bar/_ as teacher. Scope is `foo/baz`') }
   end
 
   describe '#grants_for' do

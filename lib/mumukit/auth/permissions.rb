@@ -18,7 +18,8 @@ class Mumukit::Auth::Permissions
   end
 
   def protect!(role, slug)
-    raise Mumukit::Auth::UnauthorizedAccessError.with_message(slug, scope_for(role)) unless has_permission?(role, slug)
+    raise Mumukit::Auth::UnauthorizedAccessError,
+          "Unauthorized access to #{slug} as #{role}. Scope is `#{scope_for role}`" unless has_permission?(role, slug)
   end
 
   def has_role?(role)
