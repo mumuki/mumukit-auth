@@ -13,6 +13,7 @@ require_relative './auth/token'
 require_relative './auth/scope'
 require_relative './auth/permissions'
 require_relative './auth/store'
+require_relative './auth/permissions_persistence'
 
 require 'ostruct'
 
