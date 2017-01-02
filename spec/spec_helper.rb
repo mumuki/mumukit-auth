@@ -6,7 +6,7 @@ require 'base64'
 Mumukit::Auth.configure do |c|
   c.client_id = 'foo'
   c.client_secret = Base64.encode64 'bar'
-  c.daybreak_name = ENV['MUMUKI_DAYBREAK_NAME'] || 'test.db'
+  c.persistence_strategy = Mumukit::Auth::PermissionsPersistence::Daybreak.new 'test'
 end
 
 RSpec::Matchers.define :json_like do |expected, options={}|

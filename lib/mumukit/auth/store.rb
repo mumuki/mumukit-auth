@@ -1,32 +1,33 @@
 module Mumukit::Auth
   class Store
-    def initialize(db_name)
-      @db = Daybreak::DB.new "#{db_name}.db", default: '{}'
-    end
-
-    def close
-      @db.close
+    def initialize
+      @db = Mumukit::Auth.config.persistence_strategy
     end
 
     def set!(key, value)
-      @db.update! key.to_sym => value.to_json
+      @db.set! key.to_sym, value
     end
 
     def get(key)
-      Mumukit::Auth::Permissions.load @db[key]
+      @db.get key
+    end
+
+    def clean_env!
+      @db.clean_env!
     end
 
     class << self
-      def from_env
-        new Mumukit::Auth.config.daybreak_name
+
+      def from_config
+        Mumukit::Auth.config.persistence_strategy.class.from_config
       end
 
       def clean_env!
-        FileUtils.rm ["#{Mumukit::Auth.config.daybreak_name}.db"], force: true
+        from_config.clean_env!
       end
 
       def with(&block)
-        store = from_env
+        store = from_config
         block.call store
       ensure
         store.close
