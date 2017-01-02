@@ -7,7 +7,7 @@ Mumukit::Auth.configure do |c|
   c.client_id = 'foo'
   c.client_secret = Base64.encode64 'bar'
   c.daybreak_name = 'test'
-  c.persistence_strategy = Mumukit::Auth::PermissionsPersistence.new c.daybreak_name
+  c.persistence_strategy = Mumukit::Auth::PermissionsPersistence::Daybreak.new c.daybreak_name
 end
 
 RSpec::Matchers.define :json_like do |expected, options={}|
