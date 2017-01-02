@@ -1,7 +1,7 @@
 module Mumukit::Auth
   module PermissionsPersistence
     class Daybreak
-      def self.from_env
+      def self.from_config
         new Mumukit::Auth.config.daybreak_name
       end
 

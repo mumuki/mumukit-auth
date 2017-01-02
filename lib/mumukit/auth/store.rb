@@ -18,16 +18,16 @@ module Mumukit::Auth
 
     class << self
 
-      def from_env
-        Mumukit::Auth.config.persistence_strategy.class.from_env
+      def from_config
+        Mumukit::Auth.config.persistence_strategy.class.from_config
       end
 
       def clean_env!
-        from_env.clean_env!
+        from_config.clean_env!
       end
 
       def with(&block)
-        store = from_env
+        store = from_config
         block.call store
       ensure
         store.close
