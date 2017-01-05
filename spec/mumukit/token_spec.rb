@@ -11,7 +11,7 @@ describe Mumukit::Auth::Token do
   end
 
   describe 'decode_header' do
-    let(:header) { Mumukit::Auth::Token.encode_dummy_auth_header(foo: 'bar') }
+    let(:header) { Mumukit::Auth::Token.encode_dummy_auth_header('foo@bar.com', foo: 'bar') }
 
     it { expect(Mumukit::Auth::Token.decode_header(header).metadata).to json_like foo: 'bar' }
   end

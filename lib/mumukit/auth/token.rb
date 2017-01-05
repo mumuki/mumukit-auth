@@ -13,7 +13,7 @@ module Mumukit::Auth
     end
 
     def uid
-      @uid ||= jwt['email'] || jwt['sub']
+      @uid ||= jwt['uid'] || jwt['email'] || jwt['sub']
     end
 
     def permissions
@@ -36,12 +36,12 @@ module Mumukit::Auth
       new(env.dig('omniauth.auth', 'extra', 'raw_info') || {})
     end
 
-    def self.encode_dummy_auth_header(metadata)
-      'dummy token ' + encode(metadata)
+    def self.encode_dummy_auth_header(uid, metadata)
+      'dummy token ' + encode(uid, metadata)
     end
 
-    def self.encode(metadata)
-      new(aud: Mumukit::Auth.config.client_id, metadata: metadata).encode
+    def self.encode(uid, metadata)
+      new(aud: Mumukit::Auth.config.client_id, metadata: metadata, uid: uid).encode
     end
 
     def self.decode(encoded)
