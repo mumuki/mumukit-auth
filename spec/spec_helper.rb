@@ -4,9 +4,10 @@ require 'mumukit/auth'
 require 'base64'
 
 Mumukit::Auth.configure do |c|
-  c.client_id = 'foo'
-  c.client_secret = Base64.encode64 'bar'
+  c.client_ids = {auth0: 'foo'}
+  c.client_secrets = {auth0: Base64.encode64('bar')}
   c.persistence_strategy = Mumukit::Auth::PermissionsPersistence::Daybreak.new 'test'
+  c.daybreak_name = 'test'
 end
 
 RSpec::Matchers.define :json_like do |expected, options={}|

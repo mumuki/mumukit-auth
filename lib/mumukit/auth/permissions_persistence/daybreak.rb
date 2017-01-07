@@ -22,6 +22,7 @@ module Mumukit::Auth
       end
 
       def clean_env!
+        close
         FileUtils.rm ["#{Mumukit::Auth.config.daybreak_name}.db"], force: true
       end
     end
