@@ -50,10 +50,6 @@ module Mumukit::Auth
       new(env.dig('omniauth.auth', 'extra', 'raw_info') || {})
     end
 
-    def self.encode_dummy_auth_header(uid, metadata)
-      'dummy token ' + encode(uid, metadata)
-    end
-
     def self.encode(uid, metadata, client = Mumukit::Auth::Client.new)
       new({aud: client.id, metadata: metadata, uid: uid}, client).encode
     end
@@ -62,6 +58,10 @@ module Mumukit::Auth
       new JWT.decode(encoded, client.decoded_secret)[0], client
     rescue JWT::DecodeError => e
       raise Mumukit::Auth::InvalidTokenError.new(e)
+    end
+
+    def self.encode_header(uid, metadata)
+      'Bearer ' + encode(uid, metadata)
     end
 
     def self.decode_header(header, client = Mumukit::Auth::Client.new)
