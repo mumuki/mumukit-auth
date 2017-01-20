@@ -1,11 +1,25 @@
 require 'jwt'
 
 module Mumukit::Auth
-  class Token
-    attr_reader :jwt
+  class Client
+    attr_reader :id, :secret
 
-    def initialize(jwt)
+    def initialize(options={})
+      @id = Mumukit::Auth.config.client_ids[options[:client] || :default]
+      @secret = Mumukit::Auth.config.client_secrets[options[:client] || :default]
+    end
+
+    def decoded_secret
+      JWT.base64url_decode(secret)
+    end
+  end
+
+  class Token
+    attr_reader :jwt, :client
+
+    def initialize(jwt, client)
       @jwt = jwt
+      @client = client
     end
 
     def metadata
@@ -24,33 +38,33 @@ module Mumukit::Auth
       permissions.protect! scope, resource_slug
     end
 
-    def verify_client!(client = :auth0)
-      raise Mumukit::Auth::InvalidTokenError.new('aud mismatch') if Mumukit::Auth.config.client_ids[client] != jwt['aud']
+    def verify_client!
+      raise Mumukit::Auth::InvalidTokenError.new('aud mismatch') if client.id != jwt['aud']
     end
 
-    def encode(client = :auth0)
-      JWT.encode(jwt, self.class.decoded_secret(client))
+    def encode
+      JWT.encode(jwt, client.decoded_secret)
     end
 
     def self.from_rack_env(env)
       new(env.dig('omniauth.auth', 'extra', 'raw_info') || {})
     end
 
-    def self.encode_dummy_auth_header(uid, metadata, client = :auth0)
-      'dummy token ' + encode(uid, metadata, client)
+    def self.encode_dummy_auth_header(uid, metadata)
+      'dummy token ' + encode(uid, metadata)
     end
 
-    def self.encode(uid, metadata, client = :auth0)
-      new(aud: Mumukit::Auth.config.client_ids[client], metadata: metadata, uid: uid).encode client
+    def self.encode(uid, metadata, client = Mumukit::Auth::Client.new)
+      new({aud: client.id, metadata: metadata, uid: uid}, client).encode
     end
 
-    def self.decode(encoded, client = :auth0)
-      Token.new JWT.decode(encoded, decoded_secret(client))[0]
+    def self.decode(encoded, client = Mumukit::Auth::Client.new)
+      new JWT.decode(encoded, client.decoded_secret)[0], client
     rescue JWT::DecodeError => e
       raise Mumukit::Auth::InvalidTokenError.new(e)
     end
 
-    def self.decode_header(header, client = :auth0)
+    def self.decode_header(header, client = Mumukit::Auth::Client.new)
       decode extract_from_header(header), client
     end
 
@@ -59,10 +73,6 @@ module Mumukit::Auth
       header.split(' ').last
     end
 
-    def self.decoded_secret(client = :auth0)
-      client_secret = Mumukit::Auth.config.client_secrets[client]
-      JWT.base64url_decode(client_secret)
-    end
   end
 end
 
