@@ -20,8 +20,14 @@ require 'ostruct'
 module Mumukit
   module Auth
     def self.configure
-      @config ||= OpenStruct.new
+      @config ||= defaults
       yield @config
+    end
+
+    def self.defaults
+      OpenStruct.new.tap do |config|
+        config.persistence_strategy = Mumukit::Auth::PermissionsPersistence::Daybreak.new
+      end
     end
 
     def self.config
