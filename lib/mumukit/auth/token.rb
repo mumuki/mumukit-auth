@@ -5,8 +5,9 @@ module Mumukit::Auth
     attr_reader :id, :secret
 
     def initialize(options={})
-      @id = Mumukit::Auth.config.client_ids[options[:client] || :default]
-      @secret = Mumukit::Auth.config.client_secrets[options[:client] || :default]
+      config = Mumukit::Auth.config.clients[options[:client] || :default]
+      @id = config[:id]
+      @secret = config[:secret]
     end
 
     def decoded_secret

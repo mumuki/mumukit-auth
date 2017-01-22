@@ -25,7 +25,11 @@ module Mumukit
     end
 
     def self.defaults
-      OpenStruct.new.tap do |config|
+      struct.tap do |config|
+        config.clients = struct default: {
+            id: ENV['MUMUKI_AUTH_CLIENT_ID'],
+            secret: ENV['MUMUKI_AUTH_CLIENT_SECRET']
+        }
         config.persistence_strategy = Mumukit::Auth::PermissionsPersistence::Daybreak.new
       end
     end
