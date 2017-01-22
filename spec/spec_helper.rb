@@ -4,8 +4,12 @@ require 'mumukit/core/rspec'
 
 require 'base64'
 
+def default_test_client_id
+  'foo'
+end
+
 Mumukit::Auth.configure do |c|
-  c.clients.default = {id: 'foo', secret: Base64.encode64('bar')}
+  c.clients.default = {id: default_test_client_id, secret: Base64.encode64('bar')}
   c.persistence_strategy = Mumukit::Auth::PermissionsPersistence::Daybreak.new 'test'
 end
 
