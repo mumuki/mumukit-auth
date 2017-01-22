@@ -13,6 +13,14 @@ module Mumukit::Auth
       JWT.base64url_decode(secret)
     end
 
+    def encode(jwt_hash)
+      JWT.encode(jwt_hash, decoded_secret)
+    end
+
+    def decode(encoded_jwt)
+      JWT.decode(encoded_jwt, decoded_secret)[0]
+    end
+
     private
 
     def with_config(options)

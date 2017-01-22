@@ -1,5 +1,3 @@
-require 'jwt'
-
 module Mumukit::Auth
   class Token
     attr_reader :jwt, :client
@@ -30,7 +28,7 @@ module Mumukit::Auth
     end
 
     def encode
-      JWT.encode(jwt, client.decoded_secret)
+      client.encode jwt
     end
 
     def self.from_rack_env(env)
@@ -42,7 +40,7 @@ module Mumukit::Auth
     end
 
     def self.decode(encoded, client = Mumukit::Auth::Client.new)
-      new JWT.decode(encoded, client.decoded_secret)[0], client
+      new client.decode(encoded), client
     rescue JWT::DecodeError => e
       raise Mumukit::Auth::InvalidTokenError.new(e)
     end

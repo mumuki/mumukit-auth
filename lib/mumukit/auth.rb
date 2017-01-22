@@ -1,6 +1,7 @@
 require 'active_support/all'
 require 'mumukit/core'
 require 'daybreak'
+require 'jwt'
 
 require_relative './auth/array'
 require_relative './auth/role'
