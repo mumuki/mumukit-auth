@@ -1,29 +1,28 @@
 module Mumukit::Auth
   module PermissionsPersistence
     class Daybreak
-      def self.from_config
-        new Mumukit::Auth.config.daybreak_name
-      end
-
-      def initialize(db_name)
-        @db = ::Daybreak::DB.new "#{db_name}.db", default: '{}'
-      end
-
-      def close
-        @db.close
+      def initialize(db_name = 'permissions')
+        @db_name = db_name
+        at_exit { @db.close if @db }
       end
 
       def set!(key, value)
-        @db.update! key.to_sym => value.to_json
+        db.update! key.to_sym => value.to_json
+        db.flush
       end
 
       def get(key)
-        Mumukit::Auth::Permissions.load @db[key]
+        Mumukit::Auth::Permissions.load db[key]
       end
 
-      def clean_env!
-        close
-        FileUtils.rm ["#{Mumukit::Auth.config.daybreak_name}.db"], force: true
+      def clean!
+        db.clear
+      end
+
+      private
+
+      def db
+        @db ||= ::Daybreak::DB.new "#{@db_name}.db", default: '{}'
       end
     end
   end

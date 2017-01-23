@@ -10,6 +10,21 @@
 
 ## Core Components
 
+## Config
+
+`Mumukit::Auth` comes with good defaults, but you can customize it using the `configure` method:
+
+```ruby
+Mumukit::Auth.configure do |config|
+   config.clients.default = {id: ..., secret: ...} # change the default encoding secrets,
+                                                   # see the Mumuki::Auth::Client section above
+   config.client.my_custom_client = {...}          # add a new encoding secret,
+                                                   # see the Mumuki::Auth::Client section above
+   config.persistence_strategy = # change the default persistence strategy,
+                                 # only meaningful for Mumukit::Auth::Store, see above
+end
+```
+
 ### Slugs
 
 Slugs are identifier composed of two parts, separated by a slash, similar to Github's or DockerHub's slugs. For example:
@@ -144,6 +159,8 @@ Tokens are easy-to-use JWT tokens.
 ```ruby
 # Creating
 Mumukit::Auth::Token.new metadata: {key: value}, iss: '...', aud: '...'
+Mumukit::Auth::Token.new {...},
+                         Mumukit::Auth::Client.new client: :myclient # use a custom client, see above
 
 # Decoding
 Mumukit::Auth::Token.decode('eyJh...XVCJ9.eA....X0.yRQ..Xw')
@@ -160,6 +177,30 @@ a_token.verify_client!
 a_token.jwt
 a_token.metadata
 ```
+
+### Encoding Clients
+
+In order to encode and decode JWT tokens, Mumukit::Auth uses a secret and id, which by default is read from the environment
+variables `MUMUKI_AUTH_CLIENT_ID` and `MUMUKI_AUTH_CLIENT_SECRET`. However you can control this by changing those values
+or adding more clients, so you can encode and decode multiple tokens using different id/secret pairs:
+
+```ruby
+# Change the default id and secret, useful in test environment
+Mumukit::Auth.configure do |config|
+   config.clients.default = {id: '...', secret: '...'}
+end
+
+# Add multiple clients...
+Mumukit::Auth.configure do |config|
+   config.clients.custom_client_1 = {id: '...', secret: '...'}
+   config.clients.custom_client_2 = {id: '...', secret: '...'}
+end
+#...and then use them
+Mumukit::Token.encode uid, metadata, Mumukit::Auth:Client.new(client: :custom_client_1)
+Mumukit::Token.decode encoded_token, Mumukit::Auth:Client.new(client: :custom_client_2)
+
+```
+
 
 ## License
 
