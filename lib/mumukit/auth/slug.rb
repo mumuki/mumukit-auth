@@ -46,7 +46,7 @@ module Mumukit::Auth
      end
 
     def self.join(*parts)
-      raise 'Slugs must have up to two parts' if parts.length > 2
+      raise Mumukit::Auth::InvalidSlugFormatError, 'Slugs must have up to two parts' if parts.length > 2
 
       if parts.first.is_a? Hash
         from_options parts.first
