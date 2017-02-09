@@ -1,6 +1,8 @@
 class Mumukit::Auth::Permissions
   include Mumukit::Auth::Roles
 
+  delegate :empty?, to: :scopes
+
   attr_accessor :scopes
 
   def initialize(scopes={})
@@ -35,7 +37,7 @@ class Mumukit::Auth::Permissions
   end
 
   def merge(other)
-    self.class.new(scopes.merge(other.scopes) { |_key, left, right| left.merge right})
+    self.class.new(scopes.merge(other.scopes) { |_key, left, right| left.merge right })
   end
 
   def remove_permission!(role, grant)
@@ -60,6 +62,8 @@ class Mumukit::Auth::Permissions
   end
 
   def self.parse(hash)
+    return new if hash.blank?
+
     new(Hash[hash.map { |role, grants| [role, Mumukit::Auth::Scope.parse(grants)] }])
   end
 

@@ -12,6 +12,10 @@ describe Mumukit::Auth::Permissions do
         teacher: Mumukit::Auth::Scope.parse('foo/baz'))
   end
 
+  describe '#parse' do
+    it { expect(Mumukit::Auth::Permissions.parse(nil)).to be_empty }
+  end
+
   describe '#merge' do
     it { expect(Mumukit::Auth::Permissions.new.merge(Mumukit::Auth::Permissions.new)).to json_like({}) }
     it { expect(permissions.merge(Mumukit::Auth::Permissions.new)).to json_like permissions }
