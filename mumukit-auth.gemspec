@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Mumukit::Auth::VERSION
   spec.authors       = ['Franco Leonardo Bulgarelli']
   spec.email         = ['franco@mumuki.org']
-  spec.summary       = 'Library for authenticating mumuki requests'
+  spec.summary       = 'Library for authorizing mumuki requests'
   spec.homepage      = 'http://github.com/mumuki/mumukit-auth'
   spec.license       = 'MIT'
 
