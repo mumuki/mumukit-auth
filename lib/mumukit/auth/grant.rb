@@ -23,6 +23,8 @@ module Mumukit::Auth
       case pattern
         when '*' then
           AllGrant.new
+        when '*/*' then
+          AllGrant.new
         when /(.*)\/\*/
           FirstPartGrant.new($1)
         else

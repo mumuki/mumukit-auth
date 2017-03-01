@@ -12,6 +12,17 @@ describe Mumukit::Auth::Grant do
 
   end
 
+  describe 'expanded grant all' do
+    let(:grant) { Mumukit::Auth::Grant.parse('*/*') }
+
+    it { expect(grant.allows? '_/_').to be true }
+
+    it { expect(grant.allows? 'foo/_').to be true }
+    it { expect(grant.allows? 'foo/bar').to be true }
+
+    it { expect(grant.to_s).to eq '*' }
+  end
+
   describe 'grant org' do
     let(:grant) { Mumukit::Auth::Grant.parse('foo/*') }
 
