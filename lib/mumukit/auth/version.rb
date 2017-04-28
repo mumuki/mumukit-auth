@@ -1,5 +1,5 @@
 module Mumukit
   module Auth
-    VERSION = '6.1.1'
+    VERSION = '7.0.0'
   end
 end
