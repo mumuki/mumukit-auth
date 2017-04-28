@@ -23,5 +23,5 @@ Gem::Specification.new do |spec|
 
 
   spec.add_dependency 'jwt'
-  spec.add_dependency 'mumukit-core', '~> 0.5'
+  spec.add_dependency 'mumukit-core', '~> 1.0'
 end
