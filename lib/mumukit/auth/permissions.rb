@@ -32,6 +32,10 @@ class Mumukit::Auth::Permissions
     self.scopes[role] ||= Mumukit::Auth::Scope.new
   end
 
+  def accessible_organizations
+    scope_for(:student)&.grants&.map { |grant| grant.to_mumukit_slug.organization }.to_set
+  end
+
   def add_permission!(role, *grants)
     scope_for(role).add_grant! *grants
   end

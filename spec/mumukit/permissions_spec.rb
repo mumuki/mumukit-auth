@@ -150,7 +150,26 @@ describe Mumukit::Auth::Permissions do
     end
   end
 
-  context 'remove_scope!' do
+  describe '#accessible_organizations' do
+    context 'when one organizations' do
+      let(:permissions) { parse_permissions student: 'pdep/*' }
+      it { expect(permissions.accessible_organizations.size).to eq 1 }
+    end
+    context 'when two organizations' do
+      let(:permissions) { parse_permissions student: 'pdep/*:alcal/*' }
+      it { expect(permissions.accessible_organizations.size).to eq 2 }
+    end
+    context 'when all grant present organizations' do
+      let(:permissions) { parse_permissions student: 'pdep/*:*' }
+      it { expect(permissions.accessible_organizations.size).to eq 1 }
+    end
+    context 'when one organization appears twice' do
+      let(:permissions) { parse_permissions student: 'pdep/*:pdep/*' }
+      it { expect(permissions.accessible_organizations.size).to eq 1 }
+    end
+  end
+
+  describe 'remove_permission!' do
     let(:permissions) { parse_permissions(student: 'foo/bar:test/*:foo/baz') }
 
     context 'when permission is present' do
