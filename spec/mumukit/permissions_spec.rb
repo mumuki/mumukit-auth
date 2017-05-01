@@ -74,6 +74,7 @@ describe Mumukit::Auth::Permissions do
     it { expect(permissions.teacher? 'foo/baz').to be true }
     it { expect(permissions.teacher? 'foo/_').to be true }
 
+    it { expect(permissions.owner?).to be true }
     it { expect(permissions.owner? 'test/student').to be true }
     it { expect(permissions.owner? 'test/_').to be true }
     it { expect(permissions.owner? 'test/*').to be true }
@@ -82,6 +83,8 @@ describe Mumukit::Auth::Permissions do
     it { expect(permissions.writer? 'test/student').to be true }
     it { expect(permissions.writer? 'test/_').to be true }
 
+    it { expect(permissions.student?).to be true }
+    it { expect(permissions.student? '_/_').to be true }
     it { expect(permissions.student? 'foo/bar').to be true }
     it { expect(permissions.student? 'test/student').to be true }
     it { expect(permissions.student? 'foo/student').to be true }

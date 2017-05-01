@@ -65,6 +65,10 @@ module Mumukit::Auth
       self.new *slug.split('/')
     end
 
+    def self.any
+      parse '_/_'
+    end
+
     private
 
     def match(pattern, part)

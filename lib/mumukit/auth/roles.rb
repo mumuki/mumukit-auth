@@ -3,7 +3,7 @@ module Mumukit::Auth
     ROLES = [:student, :teacher, :headmaster, :writer, :editor, :janitor, :owner]
 
     ROLES.each do |role|
-      define_method "#{role}?" do |scope|
+      define_method "#{role}?" do |scope = Mumukit::Auth::Slug.any|
         has_permission? role.to_sym, scope
       end
     end
