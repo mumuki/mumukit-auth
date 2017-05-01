@@ -1,5 +1,6 @@
 class Mumukit::Auth::Permissions
   include Mumukit::Auth::Roles
+  include Mumukit::Auth::Protection
 
   delegate :empty?, to: :scopes
 
@@ -17,11 +18,6 @@ class Mumukit::Auth::Permissions
 
   def role_allows?(role, resource_slug)
     scope_for(role).allows?(resource_slug)
-  end
-
-  def protect!(role, slug)
-    raise Mumukit::Auth::UnauthorizedAccessError,
-          "Unauthorized access to #{slug} as #{role}. Scope is `#{scope_for role}`" unless has_permission?(role, slug)
   end
 
   def has_role?(role)

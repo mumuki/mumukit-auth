@@ -12,6 +12,7 @@ require_relative './auth/grant'
 require_relative './auth/client'
 require_relative './auth/token'
 require_relative './auth/scope'
+require_relative './auth/protection'
 require_relative './auth/permissions'
 
 require 'ostruct'
