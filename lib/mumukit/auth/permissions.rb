@@ -49,8 +49,9 @@ class Mumukit::Auth::Permissions
     add_permission! role, new_grant
   end
 
-  def delegate_to?(other)
-    other.scopes.all? { |role, scope| has_all_permissions?(role, scope) }
+  def delegate_to?(other, previous = self.class.new)
+    diff = previous.as_set ^ other.as_set
+    diff.all? { |role, grant| has_permission?(role, grant) }
   end
 
   def grant_strings_for(role)
@@ -59,6 +60,10 @@ class Mumukit::Auth::Permissions
 
   def as_json(options={})
     scopes.as_json(options)
+  end
+
+  def as_set
+    Set.new scopes.flat_map { |role, scope| scope.grants.map {|grant| [role, grant]} }
   end
 
   def self.parse(hash)
@@ -77,12 +82,6 @@ class Mumukit::Auth::Permissions
 
   def self.dump(permission)
     permission.to_json
-  end
-
-  private
-
-  def has_all_permissions?(role, scope)
-    scope.grants.all? { |grant| has_permission? role, grant }
   end
 
 end
