@@ -49,6 +49,25 @@ describe Mumukit::Auth::Permissions do
     it { expect(permissions.delegate_to? parse_permissions(student: 'test/foo')).to be true }
     it { expect(permissions.delegate_to? parse_permissions(teacher: 'test/bar')).to be true }
     it { expect(permissions.delegate_to? parse_permissions(headmaster: 'test/bar')).to be true }
+
+  end
+
+  describe '#assign_to?' do
+    let(:blank_permissions) { Mumukit::Auth::Permissions.new }
+
+    context 'without changing permissions' do
+      it { expect(blank_permissions.assign_to?(permissions, permissions)).to be true }
+    end
+
+    context 'adding permissions' do
+      it { expect(permissions.assign_to?(parse_permissions(student: 'foo/*'), blank_permissions)).to be true }
+      it { expect(blank_permissions.assign_to?(permissions, blank_permissions)).to be false }
+    end
+
+    context 'removing permissions' do
+      it { expect(permissions.assign_to?(blank_permissions, parse_permissions(student: 'foo/*'))).to be true }
+      it { expect(blank_permissions.assign_to?(blank_permissions, permissions)).to be false }
+    end
   end
 
   describe 'parsing' do

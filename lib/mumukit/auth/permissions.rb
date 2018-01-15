@@ -79,6 +79,15 @@ class Mumukit::Auth::Permissions
     permission.to_json
   end
 
+  def assign_to?(other, previous)
+    diff = previous.as_set ^ other.as_set
+    diff.all? { |role, grant| has_permission?(role, grant) }
+  end
+
+  def as_set
+    Set.new scopes.flat_map { |role, scope| scope.grants.map {|grant| [role, grant]} }
+  end
+
   private
 
   def has_all_permissions?(role, scope)
