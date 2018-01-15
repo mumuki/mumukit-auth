@@ -33,10 +33,9 @@ describe Mumukit::Auth::Permissions do
     let(:permissions) do
       parse_permissions(student: 'foo/*', teacher: 'foo/baz:test/foo', headmaster: '*', janitor: 'test/bar')
     end
-    let(:blank_permissions) { Mumukit::Auth::Permissions.new }
 
 
-    it { expect(permissions.delegate_to? blank_permissions).to be true }
+    it { expect(permissions.delegate_to? Mumukit::Auth::Permissions.new).to be true }
     it { expect(permissions.delegate_to? parse_permissions(owner: 'foo/*')).to be false }
     it { expect(permissions.delegate_to? parse_permissions(student: 'foo/*')).to be true }
     it { expect(permissions.delegate_to? parse_permissions(student: 'foo/bar')).to be true }
@@ -51,20 +50,24 @@ describe Mumukit::Auth::Permissions do
     it { expect(permissions.delegate_to? parse_permissions(teacher: 'test/bar')).to be true }
     it { expect(permissions.delegate_to? parse_permissions(headmaster: 'test/bar')).to be true }
 
+  end
+
+  describe '#assign_to?' do
+    let(:blank_permissions) { Mumukit::Auth::Permissions.new }
+
     context 'without changing permissions' do
-      it { expect(blank_permissions.delegate_to?(permissions, permissions)).to be true }
+      it { expect(blank_permissions.assign_to?(permissions, permissions)).to be true }
     end
 
     context 'adding permissions' do
-      it { expect(permissions.delegate_to?(parse_permissions(student: 'foo/*'), blank_permissions)).to be true }
-      it { expect(blank_permissions.delegate_to?(permissions, blank_permissions)).to be false }
+      it { expect(permissions.assign_to?(parse_permissions(student: 'foo/*'), blank_permissions)).to be true }
+      it { expect(blank_permissions.assign_to?(permissions, blank_permissions)).to be false }
     end
 
     context 'removing permissions' do
-      it { expect(permissions.delegate_to?(blank_permissions, parse_permissions(student: 'foo/*'))).to be true }
-      it { expect(blank_permissions.delegate_to?(blank_permissions, permissions)).to be false }
+      it { expect(permissions.assign_to?(blank_permissions, parse_permissions(student: 'foo/*'))).to be true }
+      it { expect(blank_permissions.assign_to?(blank_permissions, permissions)).to be false }
     end
-
   end
 
   describe 'parsing' do
