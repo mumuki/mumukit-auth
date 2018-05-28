@@ -46,6 +46,9 @@ module Mumukit::Auth
     class Janitor < Role
       parent :owner
     end
+    class Moderator < Role
+      parent :owner
+    end
     class Owner < Role
       parent nil
 
