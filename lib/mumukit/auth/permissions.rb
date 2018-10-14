@@ -64,7 +64,12 @@ class Mumukit::Auth::Permissions
   def self.parse(hash)
     return new if hash.blank?
 
-    new(Hash[hash.map { |role, grants| [role, Mumukit::Auth::Scope.parse(grants)] }])
+    new(hash.map { |role, grants| [role, Mumukit::Auth::Scope.parse(grants)] }.to_h)
+  end
+
+  def self.reparse(something)
+    something ||= {}
+    parse(something.to_h)
   end
 
   def self.load(json)
@@ -82,6 +87,10 @@ class Mumukit::Auth::Permissions
   def assign_to?(other, previous)
     diff = previous.as_set ^ other.as_set
     diff.all? { |role, grant| has_permission?(role, grant) }
+  end
+
+  def protect_permissions_assignment!(other, previous)
+    raise Mumukit::Auth::UnauthorizedAccessError unless assign_to?(self.class.reparse(other), previous)
   end
 
   def as_set

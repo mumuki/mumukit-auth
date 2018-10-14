@@ -52,6 +52,11 @@ describe Mumukit::Auth::Permissions do
 
   end
 
+  describe '.reparse' do
+    it { expect(Mumukit::Auth::Permissions.reparse(permissions)).to eq permissions }
+    it { expect(Mumukit::Auth::Permissions.reparse(permissions).scopes).to eq permissions.scopes }
+  end
+
   describe 'to_s' do
     it { expect(Mumukit::Auth::Permissions.new.to_s).to eq '!' }
     it { expect(permissions.to_s).to eq '!student:foo/*:test/*;owner:test/*;teacher:foo/baz' }
@@ -62,11 +67,14 @@ describe Mumukit::Auth::Permissions do
 
     context 'without changing permissions' do
       it { expect(blank_permissions.assign_to?(permissions, permissions)).to be true }
+      it { expect { blank_permissions.protect_permissions_assignment! permissions, permissions }.to_not raise_error }
     end
 
     context 'adding permissions' do
       it { expect(permissions.assign_to?(parse_permissions(student: 'foo/*'), blank_permissions)).to be true }
       it { expect(blank_permissions.assign_to?(permissions, blank_permissions)).to be false }
+      it { expect { blank_permissions.protect_permissions_assignment! permissions, blank_permissions }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
+
     end
 
     context 'removing permissions' do
