@@ -88,6 +88,28 @@ class Mumukit::Auth::Permissions
     Set.new scopes.flat_map { |role, scope| scope.grants.map {|grant| [role, grant]} }
   end
 
+  def ==(other)
+    self.class == other.class && self.scopes == other.scopes
+  end
+
+  alias_method :eql?, :==
+
+  def hash
+    scopes.hash
+  end
+
+  def to_s
+    '!' + scopes.map { |role, scope| "#{role}:#{scope}" }.join(';')
+  end
+
+  def inspect
+    "<Mumukit::Auth::Permissions #{to_s}>"
+  end
+
+  def to_h
+    as_json
+  end
+
   private
 
   def has_all_permissions?(role, scope)

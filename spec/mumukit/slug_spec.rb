@@ -2,6 +2,10 @@ require 'spec_helper'
 
 describe Mumukit::Auth::Slug do
 
+  it { expect('foo/*'.to_mumukit_slug == 'foo/*'.to_mumukit_slug).to be true }
+  it { expect('foo/*'.to_mumukit_slug.eql? 'foo/*'.to_mumukit_slug).to be true }
+  it { expect('foo/*'.to_mumukit_slug.hash == 'foo/*'.to_mumukit_slug.hash).to be true }
+
   it { expect(Mumukit::Auth::Slug.new('foo', 'bar').to_s).to eq 'foo/bar' }
   it { expect(Mumukit::Auth::Slug.parse('foo/bar').to_s).to eq 'foo/bar' }
   it { expect(Mumukit::Auth::Slug.join('foo', 'bar').to_s).to eq 'foo/bar' }

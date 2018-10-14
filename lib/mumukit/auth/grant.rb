@@ -19,6 +19,16 @@ module Mumukit::Auth
       other.class == self.class && to_s == other.to_s
     end
 
+    alias_method :eql?, :==
+
+    def hash
+      to_s.hash
+    end
+
+    def inspect
+      "<Mumukit::Auth::Grant #{to_s}>"
+    end
+
     def self.parse(pattern)
       case pattern
         when '*' then

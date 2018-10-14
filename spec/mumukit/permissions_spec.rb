@@ -52,6 +52,11 @@ describe Mumukit::Auth::Permissions do
 
   end
 
+  describe 'to_s' do
+    it { expect(Mumukit::Auth::Permissions.new.to_s).to eq '!' }
+    it { expect(permissions.to_s).to eq '!student:foo/*:test/*;owner:test/*;teacher:foo/baz' }
+  end
+
   describe '#assign_to?' do
     let(:blank_permissions) { Mumukit::Auth::Permissions.new }
 

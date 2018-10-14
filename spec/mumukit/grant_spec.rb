@@ -1,6 +1,24 @@
 require 'spec_helper'
 
 describe Mumukit::Auth::Grant do
+  describe 'compare' do
+    it { expect('*'.to_mumukit_grant == '*'.to_mumukit_grant).to be true }
+    it { expect('*'.to_mumukit_grant.eql? '*'.to_mumukit_grant).to be true }
+    it { expect('*'.to_mumukit_grant.hash == '*'.to_mumukit_grant.hash).to be true }
+
+    it { expect('foo/*'.to_mumukit_grant == 'foo/*'.to_mumukit_grant).to be true }
+    it { expect('foo/*'.to_mumukit_grant.eql? 'foo/*'.to_mumukit_grant).to be true }
+    it { expect('foo/*'.to_mumukit_grant.hash == 'foo/*'.to_mumukit_grant.hash).to be true }
+
+    it { expect('foo/bar'.to_mumukit_grant == 'foo/bar'.to_mumukit_grant).to be true }
+    it { expect('foo/bar'.to_mumukit_grant.eql? 'foo/bar'.to_mumukit_grant).to be true }
+    it { expect('foo/bar'.to_mumukit_grant.hash == 'foo/bar'.to_mumukit_grant.hash).to be true }
+
+    it { expect('foo/bar'.to_mumukit_grant == 'foo/*'.to_mumukit_grant).to be false }
+    it { expect('foo/bar'.to_mumukit_grant.eql? 'foo/*'.to_mumukit_grant).to be false }
+    it { expect('foo/bar'.to_mumukit_grant.hash == 'foo/*'.to_mumukit_grant.hash).to be false }
+  end
+
   describe 'grant all' do
     let(:grant) { Mumukit::Auth::Grant.parse('*') }
 

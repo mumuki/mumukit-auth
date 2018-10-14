@@ -31,8 +31,18 @@ module Mumukit::Auth
       self.class == o.class && to_s == o.to_s
     end
 
+    alias_method :eql?, :==
+
+    def hash
+      to_s.hash
+    end
+
     def to_s
       "#{first}/#{second}"
+    end
+
+    def inspect
+      "<Mumukit::Auth::Slug #{to_s}>"
     end
 
     def to_mumukit_slug

@@ -24,8 +24,22 @@ module Mumukit::Auth
       self.class.new grants + other.grants
     end
 
+    def ==(other)
+      self.class == other.class && self.grants == other.grants
+    end
+
+    alias_method :eql?, :==
+
+    def hash
+      grants.hash
+    end
+
     def to_s
       grants.map(&:to_s).join(':')
+    end
+
+    def inspect
+      "<Mumukit::Auth::Scope #{to_s}>"
     end
 
     def present?
