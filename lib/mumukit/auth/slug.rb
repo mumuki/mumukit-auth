@@ -27,6 +27,10 @@ module Mumukit::Auth
       match self.second, second
     end
 
+    def rebase(new_organizaton)
+      self.class.new new_organizaton, repository
+    end
+
     def ==(o)
       self.class == o.class && to_s == o.to_s
     end
@@ -53,7 +57,7 @@ module Mumukit::Auth
       first = hash[:first] || hash[:organization]
       second = hash[:second] || hash[:repository] || hash[:course] || hash[:content]
       new(first, second)
-     end
+    end
 
     def self.join(*parts)
       raise Mumukit::Auth::InvalidSlugFormatError, 'Slugs must have up to two parts' if parts.length > 2
