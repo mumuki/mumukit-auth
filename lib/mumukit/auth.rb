@@ -19,10 +19,7 @@ require 'ostruct'
 
 module Mumukit
   module Auth
-    def self.configure
-      @config ||= defaults
-      yield @config
-    end
+    extend Mumukit::Core::Configurable
 
     def self.defaults
       struct.tap do |config|
@@ -31,10 +28,6 @@ module Mumukit
             secret: ENV['MUMUKI_AUTH_CLIENT_SECRET']
         }
       end
-    end
-
-    def self.config
-      @config
     end
   end
 end
