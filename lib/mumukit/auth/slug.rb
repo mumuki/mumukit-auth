@@ -15,8 +15,8 @@ module Mumukit::Auth
     alias_method :content, :second
 
     def initialize(first, second)
-      @first = first
-      @second = second
+      @first = first.downcase
+      @second = second.downcase
     end
 
     def match_first(first)

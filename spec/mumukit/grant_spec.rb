@@ -1,6 +1,12 @@
 require 'spec_helper'
 
 describe Mumukit::Auth::Grant do
+  describe 'to_s' do
+    it { expect('Foo/*'.to_mumukit_grant.to_s).to eq  'foo/*' }
+    it { expect('*'.to_mumukit_grant.to_s).to eq  '*' }
+    it { expect('Foo/Bar'.to_mumukit_grant.to_s).to eq  'foo/bar' }
+  end
+
   describe 'compare' do
     it { expect('foo/baz'.to_mumukit_grant).to eq  'foo/baz'.to_mumukit_grant }
     it { expect('FOO/BAZ'.to_mumukit_grant).to eq  'foo/baz'.to_mumukit_grant }
