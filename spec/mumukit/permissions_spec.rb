@@ -142,7 +142,7 @@ describe Mumukit::Auth::Permissions do
     it { expect(Mumukit::Auth::Permissions.parse(student: 'foo/bar:baz/goo').grant_strings_for :student).to eq ['foo/bar', 'baz/goo'] }
   end
 
-  describe 'add_scope!' do
+  describe 'add_permission!' do
     let(:permissions) { parse_permissions({}) }
     context 'when no teacher permissions added' do
       before { permissions.add_permission!(:teacher, 'test/bar') }
@@ -153,6 +153,7 @@ describe Mumukit::Auth::Permissions do
       it { expect(permissions.teacher? 'test/bar').to eq true }
 
       it { expect(permissions.has_permission? :teacher, 'test/bar').to be true }
+      it { expect(permissions.has_permission? :teacher, 'Test/Bar').to be true }
       it { expect(permissions.has_permission? :teacher, 'test/baz').to be false }
 
       it { expect(permissions.as_json).to json_like(teacher: 'test/bar') }
@@ -164,7 +165,14 @@ describe Mumukit::Auth::Permissions do
         it { expect(permissions.has_permission? :teacher, 'test/baz').to be true }
       end
 
+      context 'when added broader grant with upcase' do
+        before { permissions.add_permission! :teacher, 'Test/*' }
+
+        it { expect(permissions).to json_like teacher: 'test/*' }
+        it { expect(permissions.has_permission? :teacher, 'test/baz').to be true }
+      end
     end
+
     context 'when no student permissions added' do
       before { permissions.add_permission!(:student, 'test/*') }
 
@@ -240,6 +248,7 @@ describe Mumukit::Auth::Permissions do
     it { expect(permissions.headmaster? 'foo/baz').to eq true }
     it { expect(permissions.headmaster? 'bar/baz').to eq false }
     it { expect(permissions.headmaster? 'test/baz').to eq true }
+    it { expect(permissions.headmaster? 'Test/baz').to eq true }
     it { expect(permissions.owner? 'test/baz').to eq true }
 
   end

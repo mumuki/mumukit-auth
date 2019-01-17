@@ -1,7 +1,18 @@
 require 'spec_helper'
 
 describe Mumukit::Auth::Grant do
+  describe 'to_s' do
+    it { expect('Foo/*'.to_mumukit_grant.to_s).to eq  'foo/*' }
+    it { expect('*'.to_mumukit_grant.to_s).to eq  '*' }
+    it { expect('Foo/Bar'.to_mumukit_grant.to_s).to eq  'foo/bar' }
+  end
+
   describe 'compare' do
+    it { expect('foo/baz'.to_mumukit_grant).to eq  'foo/baz'.to_mumukit_grant }
+    it { expect('FOO/BAZ'.to_mumukit_grant).to eq  'foo/baz'.to_mumukit_grant }
+    it { expect('Foo/Baz'.to_mumukit_grant).to eq  'FOO/BAZ'.to_mumukit_grant }
+    it { expect('Foo/*'.to_mumukit_grant).to eq  'FOO/*'.to_mumukit_grant }
+
     it { expect('*'.to_mumukit_grant == '*'.to_mumukit_grant).to be true }
     it { expect('*'.to_mumukit_grant.eql? '*'.to_mumukit_grant).to be true }
     it { expect('*'.to_mumukit_grant.hash == '*'.to_mumukit_grant.hash).to be true }
@@ -27,6 +38,7 @@ describe Mumukit::Auth::Grant do
     it { expect(grant.allows? 'foo/_').to be true }
 
     it { expect(grant.allows? 'foo/bar').to be true }
+    it { expect(grant.allows? 'Foo/Bar').to be true }
 
   end
 
@@ -37,6 +49,7 @@ describe Mumukit::Auth::Grant do
 
     it { expect(grant.allows? 'foo/_').to be true }
     it { expect(grant.allows? 'foo/bar').to be true }
+    it { expect(grant.allows? 'FOO/BAR').to be true }
 
     it { expect(grant.to_s).to eq '*' }
   end
@@ -47,6 +60,7 @@ describe Mumukit::Auth::Grant do
     it { expect(grant.allows? '_/_').to be true }
 
     it { expect(grant.allows? 'foo/_').to be true }
+    it { expect(grant.allows? 'FOO/Bar').to be true }
 
     it { expect(grant.allows? 'fooz/_').to be false }
     it { expect(grant.allows? 'xfoo/_').to be false }
@@ -70,6 +84,9 @@ describe Mumukit::Auth::Grant do
     it { expect(grant.allows? 'foo/bag').to be false }
     it { expect(grant.allows? 'foo/bar').to be true }
     it { expect(grant.allows? 'fooz/baz').to be false }
+
+    it { expect(grant.allows? 'FOO/BAR').to be true }
+    it { expect(Mumukit::Auth::Grant.parse('FOO/Bar').allows? 'foo/BAR').to be true }
   end
 
 end

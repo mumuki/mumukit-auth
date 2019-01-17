@@ -16,6 +16,7 @@ describe Mumukit::Auth::Scope do
     it { expect(scope.allows? 'xfoo/baz').to be false }
     it { expect(scope.allows? 'mumuki/funcional').to be true }
     it { expect(scope.allows? 'mumuki/logico').to be true }
+    it { expect(scope.allows? 'Mumuki/Logico').to be true }
   end
 
   describe 'grant none' do

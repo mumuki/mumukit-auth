@@ -1,6 +1,9 @@
 require 'spec_helper'
 
 describe Mumukit::Auth::Slug do
+  it { expect('foo/baz'.to_mumukit_slug).to eq  'foo/baz'.to_mumukit_slug }
+  it { expect('FOO/BAZ'.to_mumukit_slug).to eq  'foo/baz'.to_mumukit_slug }
+  it { expect('Foo/Baz'.to_mumukit_slug).to eq  'FOO/BAZ'.to_mumukit_slug }
 
   it { expect('foo/baz'.to_mumukit_slug.rebase('bar')).to eq  'bar/baz'.to_mumukit_slug }
 
