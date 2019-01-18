@@ -15,6 +15,9 @@ module Mumukit::Auth
     alias_method :content, :second
 
     def initialize(first, second)
+      raise 'slug first part must be non-nil' unless first
+      raise 'slug second part must be non-nil' unless second
+
       @first = first.downcase
       @second = second.downcase
     end

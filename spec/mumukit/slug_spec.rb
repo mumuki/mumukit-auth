@@ -11,6 +11,9 @@ describe Mumukit::Auth::Slug do
   it { expect('foo/*'.to_mumukit_slug.eql? 'foo/*'.to_mumukit_slug).to be true }
   it { expect('foo/*'.to_mumukit_slug.hash == 'foo/*'.to_mumukit_slug.hash).to be true }
 
+  it { expect { Mumukit::Auth::Slug.new(nil, 'bar') }.to raise_error 'slug first part must be non-nil' }
+  it { expect { Mumukit::Auth::Slug.new('foo', nil) }.to raise_error 'slug second part must be non-nil' }
+
   it { expect(Mumukit::Auth::Slug.new('foo', 'bar').to_s).to eq 'foo/bar' }
   it { expect(Mumukit::Auth::Slug.parse('foo/bar').to_s).to eq 'foo/bar' }
   it { expect(Mumukit::Auth::Slug.join('foo', 'bar').to_s).to eq 'foo/bar' }
