@@ -18,16 +18,16 @@ module Mumukit::Auth
       raise 'slug first part must be non-nil' unless first
       raise 'slug second part must be non-nil' unless second
 
-      @first = first.downcase
-      @second = second.downcase
+      @first = first
+      @second = second
     end
 
     def match_first(first)
-      match self.first, first
+      match self.first.downcase, first.downcase
     end
 
     def match_second(second)
-      match self.second, second
+      match self.second.downcase, second.downcase
     end
 
     def rebase(new_organizaton)
@@ -35,17 +35,21 @@ module Mumukit::Auth
     end
 
     def ==(o)
-      self.class == o.class && to_s == o.to_s
+      self.class == o.class && to_case_insensitive_s == o.to_case_insensitive_s
     end
 
     alias_method :eql?, :==
 
     def hash
-      to_s.hash
+      to_case_insensitive_s.hash
     end
 
     def to_s
       "#{first}/#{second}"
+    end
+
+    def to_case_insensitive_s
+      @case_insensitive_s ||= to_s.downcase
     end
 
     def inspect

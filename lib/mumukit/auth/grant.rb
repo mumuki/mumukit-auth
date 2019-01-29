@@ -86,7 +86,7 @@ module Mumukit::Auth
     end
 
     def to_s
-      @slug.to_s
+      @slug.to_case_insensitive_s
     end
 
     def to_mumukit_slug
