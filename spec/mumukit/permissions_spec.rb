@@ -193,22 +193,26 @@ describe Mumukit::Auth::Permissions do
     end
   end
 
-  describe '#accessible_organizations' do
-    context 'when one organizations' do
+  describe '#student_granted_organizations' do
+    context 'when there is one organization' do
       let(:permissions) { parse_permissions student: 'pdep/*' }
-      it { expect(permissions.accessible_organizations.size).to eq 1 }
+      it { expect(permissions.student_granted_organizations.size).to eq 1 }
     end
-    context 'when two organizations' do
+    context 'when there are granted organization with other roles' do
+      let(:permissions) { parse_permissions student: 'pdep/*', teacher: 'alcal/*' }
+      it { expect(permissions.student_granted_organizations.size).to eq 1 }
+    end
+    context 'when there are two organizations' do
       let(:permissions) { parse_permissions student: 'pdep/*:alcal/*' }
-      it { expect(permissions.accessible_organizations.size).to eq 2 }
+      it { expect(permissions.student_granted_organizations.size).to eq 2 }
     end
     context 'when all grant present organizations' do
       let(:permissions) { parse_permissions student: 'pdep/*:*' }
-      it { expect(permissions.accessible_organizations.size).to eq 1 }
+      it { expect(permissions.student_granted_organizations.size).to eq 1 }
     end
     context 'when one organization appears twice' do
       let(:permissions) { parse_permissions student: 'pdep/*:pdep/*' }
-      it { expect(permissions.accessible_organizations.size).to eq 1 }
+      it { expect(permissions.student_granted_organizations.size).to eq 1 }
     end
   end
 

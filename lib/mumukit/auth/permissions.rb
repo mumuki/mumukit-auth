@@ -28,8 +28,21 @@ class Mumukit::Auth::Permissions
     self.scopes[role] ||= Mumukit::Auth::Scope.new
   end
 
+  # Deprecated: use `student_granted_organizations` organizations instead
   def accessible_organizations
-    scope_for(:student)&.grants&.map { |grant| grant.to_mumukit_slug.organization }.to_set
+    warn "Don't use accessible_organizations, since this method is probably not doing what you would expect.\n" +
+         "Use student_granted_organizations if you still need its behaviour"
+    student_granted_organizations
+  end
+
+  # Answers the organizations for which the user has been explicitly granted acceses as student.
+  # This method does not include the organizations the user has access because of the roles hierarchy
+  def student_granted_organizations
+    granted_organizations_for :student
+  end
+
+  def granted_organizations_for(role)
+    scope_for(role)&.grants&.map { |grant| grant.to_mumukit_slug.organization }.to_set
   end
 
   def add_permission!(role, *grants)
