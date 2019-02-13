@@ -51,8 +51,8 @@ module Mumukit::Auth
     end
 
     def normalize!
-      @first = @first.downcase
-      @second = @second.downcase
+      @first = @first.parameterize
+      @second = @second.parameterize
       self
     end
 

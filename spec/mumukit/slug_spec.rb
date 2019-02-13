@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe Mumukit::Auth::Slug do
   it { expect('Foo/Baz'.to_mumukit_slug.normalize).to eql  'foo/baz'.to_mumukit_slug }
+  it { expect('foo/bar--baz'.to_mumukit_slug.normalize).to eql  'foo/bar-baz'.to_mumukit_slug }
+  it { expect('ein Bär/in München'.to_mumukit_slug.normalize).to eql  'ein-bar/in-munchen'.to_mumukit_slug }
 
   it { expect('foo/baz'.to_mumukit_slug).to eq  'foo/baz'.to_mumukit_slug }
   it { expect('FOO/BAZ'.to_mumukit_slug).to eq  'foo/baz'.to_mumukit_slug }

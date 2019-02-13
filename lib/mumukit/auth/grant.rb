@@ -59,7 +59,7 @@ module Mumukit::Auth
 
   class FirstPartGrant < Grant
     def initialize(first)
-      @first = first.downcase
+      @first = first.parameterize
     end
 
     def allows?(resource_slug)
