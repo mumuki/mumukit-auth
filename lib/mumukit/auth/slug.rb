@@ -23,11 +23,11 @@ module Mumukit::Auth
     end
 
     def match_first(first)
-      match self.first.downcase, first.downcase
+      match self.first, first
     end
 
     def match_second(second)
-      match self.second.downcase, second.downcase
+      match self.second, second
     end
 
     def rebase(new_organizaton)
@@ -35,21 +35,29 @@ module Mumukit::Auth
     end
 
     def ==(o)
-      self.class == o.class && to_case_insensitive_s == o.to_case_insensitive_s
+      self.class == o.class && self.normalize.eql?(o.normalize)
     end
 
-    alias_method :eql?, :==
+    def eql?(o)
+      self.class == o.class && to_s == o.to_s
+    end
 
     def hash
-      to_case_insensitive_s.hash
+      to_s.hash
     end
 
     def to_s
       "#{first}/#{second}"
     end
 
-    def to_case_insensitive_s
-      @case_insensitive_s ||= to_s.downcase
+    def normalize!
+      @first = @first.downcase
+      @second = @second.downcase
+      self
+    end
+
+    def normalize
+      dup.normalize!
     end
 
     def inspect
@@ -88,6 +96,10 @@ module Mumukit::Auth
 
     def self.any
       parse '_/_'
+    end
+
+    def self.normalize(first, second)
+      new(first, second).normalize!
     end
 
     private

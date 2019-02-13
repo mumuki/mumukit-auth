@@ -1,9 +1,15 @@
 require 'spec_helper'
 
 describe Mumukit::Auth::Slug do
+  it { expect('Foo/Baz'.to_mumukit_slug.normalize).to eql  'foo/baz'.to_mumukit_slug }
+
   it { expect('foo/baz'.to_mumukit_slug).to eq  'foo/baz'.to_mumukit_slug }
   it { expect('FOO/BAZ'.to_mumukit_slug).to eq  'foo/baz'.to_mumukit_slug }
   it { expect('Foo/Baz'.to_mumukit_slug).to eq  'FOO/BAZ'.to_mumukit_slug }
+
+  it { expect('foo/baz'.to_mumukit_slug).to eql  'foo/baz'.to_mumukit_slug }
+  it { expect('FOO/BAZ'.to_mumukit_slug).to_not eql 'foo/baz'.to_mumukit_slug }
+  it { expect('Foo/Baz'.to_mumukit_slug).to_not eql 'FOO/BAZ'.to_mumukit_slug }
 
   it { expect('foo/baz'.to_mumukit_slug.rebase('bar')).to eq  'bar/baz'.to_mumukit_slug }
 
@@ -30,4 +36,7 @@ describe Mumukit::Auth::Slug do
 
   it { expect { Mumukit::Auth::Slug.join('foo', 'bar', 'baz') }.to raise_error 'Slugs must have up to two parts' }
   it { expect { Mumukit::Auth::Slug.parse('baz') }.to raise_error 'Invalid slug: baz. It must be in first/second format' }
+
+  it { expect(Mumukit::Auth::Slug.normalize('foo', 'bar').to_s).to eq 'foo/bar' }
+  it { expect(Mumukit::Auth::Slug.normalize('Foo', 'Bar').to_s).to eq 'foo/bar' }
 end
