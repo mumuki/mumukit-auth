@@ -59,11 +59,11 @@ module Mumukit::Auth
 
   class FirstPartGrant < Grant
     def initialize(first)
-      @first = first.downcase
+      @first = first.parameterize
     end
 
     def allows?(resource_slug)
-      resource_slug.to_mumukit_slug.match_first @first
+      resource_slug.to_mumukit_slug.normalize!.match_first @first
     end
 
     def to_s
@@ -77,16 +77,16 @@ module Mumukit::Auth
 
   class SingleGrant < Grant
     def initialize(slug)
-      @slug = slug
+      @slug = slug.normalize
     end
 
     def allows?(resource_slug)
-      resource_slug = resource_slug.to_mumukit_slug
+      resource_slug = resource_slug.to_mumukit_slug.normalize!
       resource_slug.match_first(@slug.first) && resource_slug.match_second(@slug.second)
     end
 
     def to_s
-      @slug.to_case_insensitive_s
+      @slug.to_s
     end
 
     def to_mumukit_slug
