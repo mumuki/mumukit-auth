@@ -17,9 +17,9 @@
 ```ruby
 Mumukit::Auth.configure do |config|
    config.clients.default = {id: ..., secret: ...} # change the default encoding secrets,
-                                                   # see the Mumuki::Auth::Client section above
+                                                   # see the Mumukit::Auth::Client section above
    config.client.my_custom_client = {...}          # add a new encoding secret,
-                                                   # see the Mumuki::Auth::Client section above
+                                                   # see the Mumukit::Auth::Client section above
    config.persistence_strategy = # change the default persistence strategy,
                                  # only meaningful for Mumukit::Auth::Store, see above
 end
@@ -123,7 +123,7 @@ role-->^^^^^           ^^^^^^<---- grant
 The simplest way of instantiating the previous permissions is the following:
 
 ```ruby
-Mumuki::Auth::Permissions.parse(writer: 'foo/*:bar/baz')
+Mumukit::Auth::Permissions.parse(writer: 'foo/*:bar/baz')
 ```
 
 You can use `Mumukit::Auth::Permissions` the following way:
@@ -144,7 +144,7 @@ some_permissions.protect! :student, 'foo/_' # similar to previous samples,
 
 # Converting from and to json
 some_permissions.to_json
-Mumuki::Auth::Permissions.load('"writer": "foo/*:bar/baz"')
+Mumukit::Auth::Permissions.load('"writer": "foo/*:bar/baz"')
 
 # Merging Permissions
 permissions_1 = Mumukit::Auth::Permissions.parse(student: 'foo/*', teacher: 'foo/baz', owner: 'foobar/baz')
