@@ -39,4 +39,6 @@ describe Mumukit::Auth::Slug do
 
   it { expect(Mumukit::Auth::Slug.normalize('foo', 'bar').to_s).to eq 'foo/bar' }
   it { expect(Mumukit::Auth::Slug.normalize('Foo', 'Bar').to_s).to eq 'foo/bar' }
+  it { expect(Mumukit::Auth::Slug.normalize('foo.bar', 'baz').to_s).to eq 'foo.bar/baz' }
+  it { expect(Mumukit::Auth::Slug.normalize('FOO.baR', 'bAz').to_s).to eq 'foo.bar/baz' }
 end
