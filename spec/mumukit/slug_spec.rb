@@ -43,4 +43,15 @@ describe Mumukit::Auth::Slug do
   it { expect(Mumukit::Auth::Slug.normalize('Foo', 'Bar').to_s).to eq 'foo/bar' }
   it { expect(Mumukit::Auth::Slug.normalize('foo.bar', 'baz').to_s).to eq 'foo.bar/baz' }
   it { expect(Mumukit::Auth::Slug.normalize('FOO.baR', 'bAz').to_s).to eq 'foo.bar/baz' }
+
+  it { expect { Mumukit::Auth::Slug.validate_slug!('foo/bar') }.to_not raise_error }
+  it { expect { Mumukit::Auth::Slug.validate_slug!('foo-bar/baz') }.to_not raise_error }
+  it { expect { Mumukit::Auth::Slug.validate_slug!('FOO.baR/bAz') }.to_not raise_error }
+  it { expect { Mumukit::Auth::Slug.validate_slug!('123/!@#') }.to_not raise_error }
+  
+  it { expect { Mumukit::Auth::Slug.validate_slug!('/') }.to raise_error }
+  it { expect { Mumukit::Auth::Slug.validate_slug!('foo/') }.to raise_error }
+  it { expect { Mumukit::Auth::Slug.validate_slug!('/bar') }.to raise_error }
+  it { expect { Mumukit::Auth::Slug.validate_slug!('foo/bar/baz') }.to raise_error }
+  it { expect { Mumukit::Auth::Slug.validate_slug!("foo/bar\nbaz") }.to raise_error }
 end

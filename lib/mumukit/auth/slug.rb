@@ -113,7 +113,7 @@ module Mumukit::Auth
     end
 
     def self.validate_slug!(slug)
-      unless slug =~ /.*\/.*/
+      unless slug =~ /\A[^\/\n]+\/[^\/\n]+\z/
         raise Mumukit::Auth::InvalidSlugFormatError, "Invalid slug: #{slug}. It must be in first/second format"
       end
     end
