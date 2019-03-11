@@ -51,8 +51,8 @@ module Mumukit::Auth
     end
 
     def normalize!
-      @first = @first.downcase
-      @second = @second.downcase
+      @first = normalize_part @first
+      @second = normalize_part @second
       self
     end
 
@@ -103,6 +103,10 @@ module Mumukit::Auth
     end
 
     private
+
+    def normalize_part(slug_part)
+      slug_part.split('.').map(&:parameterize).join('.')
+    end
 
     def match(pattern, part)
       pattern == '_' || pattern == part
