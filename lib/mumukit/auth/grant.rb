@@ -30,16 +30,25 @@ module Mumukit::Auth
     end
 
     def self.parse(pattern)
-      case pattern
-        when '*' then
-          AllGrant.new
-        when '*/*' then
-          AllGrant.new
-        when /(.*)\/\*/
-          FirstPartGrant.new($1)
-        else
-          SingleGrant.new(Slug.parse pattern)
+      grant_types.each do |type|
+        type.try_parse(pattern).try { |it| return it }
       end
+    end
+
+    def self.grant_types
+      custom_grant_types + [AllGrant, FirstPartGrant, SingleGrant]
+    end
+
+    def self.add_custom_grant_type!(grant_type)
+      custom_grant_types << grant_type
+    end
+
+    def self.remove_custom_grant_type!(grant_type)
+      custom_grant_types.delete(grant_type)
+    end
+
+    def self.custom_grant_types
+      @custom_grant_types ||= []
     end
   end
 
@@ -54,6 +63,10 @@ module Mumukit::Auth
 
     def to_mumukit_slug
       Mumukit::Auth::Slug.new '*', '*'
+    end
+
+    def self.try_parse(pattern)
+      new if ['*', '*/*'].include? pattern
     end
   end
 
@@ -73,6 +86,10 @@ module Mumukit::Auth
     def to_mumukit_slug
       Mumukit::Auth::Slug.new @first, '*'
     end
+
+    def self.try_parse(pattern)
+      new($1) if pattern =~ /(.*)\/\*/
+    end
   end
 
   class SingleGrant < Grant
@@ -91,6 +108,10 @@ module Mumukit::Auth
 
     def to_mumukit_slug
       @slug
+    end
+
+    def self.try_parse(pattern)
+      new(Slug.parse pattern)
     end
   end
 end

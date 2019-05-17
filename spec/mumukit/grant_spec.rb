@@ -89,4 +89,33 @@ describe Mumukit::Auth::Grant do
     it { expect(Mumukit::Auth::Grant.parse('FOO/Bar').allows? 'foo/BAR').to be true }
   end
 
+  describe 'custom grant' do
+    class IncludesGrant < Mumukit::Auth::Grant
+      def allows?(resource_slug)
+        resource_slug.to_mumukit_slug.first.include? 'foo'
+      end
+
+      def to_s
+        '{includes:foo}'
+      end
+
+      def to_mumukit_slug
+        Mumukit::Auth::Slug.new '*', '*'
+      end
+
+      def self.try_parse(pattern)
+        new if pattern =~ /\{includes\:foo\}\/\*/
+      end
+    end
+    before(:all) { Mumukit::Auth::Grant.add_custom_grant_type! IncludesGrant  }
+    after(:all) { Mumukit::Auth::Grant.remove_custom_grant_type! IncludesGrant  }
+
+    let(:grant) { Mumukit::Auth::Grant.parse('{includes:foo}/*') }
+
+    it { expect(Mumukit::Auth::Grant.custom_grant_types).to eq [IncludesGrant]}
+    it { expect(grant.allows? 'foo/baz').to be true }
+    it { expect(grant.allows? 'foobar/baz').to be true }
+    it { expect(grant.allows? 'bar/baz').to be false }
+
+  end
 end
