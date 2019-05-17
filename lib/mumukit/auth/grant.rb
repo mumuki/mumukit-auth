@@ -4,9 +4,30 @@ class String
   end
 end
 
+module Mumukit::Auth::Grant
+  def self.parse(pattern)
+    grant_types.each do |type|
+      type.try_parse(pattern).try { |it| return it }
+    end
+  end
 
-module Mumukit::Auth
-  class Grant
+  def self.grant_types
+    custom_grant_types + [AllGrant, FirstPartGrant, SingleGrant]
+  end
+
+  def self.add_custom_grant_type!(grant_type)
+    custom_grant_types << grant_type
+  end
+
+  def self.remove_custom_grant_type!(grant_type)
+    custom_grant_types.delete(grant_type)
+  end
+
+  def self.custom_grant_types
+    @custom_grant_types ||= []
+  end
+
+  class Base
     def as_json(options={})
       to_s
     end
@@ -28,31 +49,9 @@ module Mumukit::Auth
     def inspect
       "<Mumukit::Auth::Grant #{to_s}>"
     end
-
-    def self.parse(pattern)
-      grant_types.each do |type|
-        type.try_parse(pattern).try { |it| return it }
-      end
-    end
-
-    def self.grant_types
-      custom_grant_types + [AllGrant, FirstPartGrant, SingleGrant]
-    end
-
-    def self.add_custom_grant_type!(grant_type)
-      custom_grant_types << grant_type
-    end
-
-    def self.remove_custom_grant_type!(grant_type)
-      custom_grant_types.delete(grant_type)
-    end
-
-    def self.custom_grant_types
-      @custom_grant_types ||= []
-    end
   end
 
-  class AllGrant < Grant
+  class AllGrant < Base
     def allows?(_resource_slug)
       true
     end
@@ -70,7 +69,7 @@ module Mumukit::Auth
     end
   end
 
-  class FirstPartGrant < Grant
+  class FirstPartGrant < Base
     def initialize(first)
       @first = first.downcase
     end
@@ -92,7 +91,7 @@ module Mumukit::Auth
     end
   end
 
-  class SingleGrant < Grant
+  class SingleGrant < Base
     def initialize(slug)
       @slug = slug.normalize
     end
@@ -111,7 +110,7 @@ module Mumukit::Auth
     end
 
     def self.try_parse(pattern)
-      new(Slug.parse pattern)
+      new(Mumukit::Auth::Slug.parse pattern)
     end
   end
 end
