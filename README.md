@@ -103,6 +103,17 @@ a_grant.to_s
 "baz/bar".to_mumukit_grant.allows? Mumukit::Auth::Slug.join('foo') # false
 ```
 
+#### Defining custom Grants
+
+Grants can be extend, by inheriting from `Mumukit::Auth::Grant::Base`, and defining the following method:
+
+* `#allows?(resource_slug)`
+* `#to_s`
+* `#to_mumukit_slug`
+* `.try_parse(pattern)`
+
+New grant types must be registered using: `Mumukit::Auth::Grant.add_custom_grant_type!`
+
 ### Roles
 
 ```ruby
