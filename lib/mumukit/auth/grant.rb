@@ -56,6 +56,10 @@ module Mumukit::Auth::Grant
       true
     end
 
+    def includes?(_)
+      true
+    end
+
     def to_s
       '*'
     end
@@ -70,6 +74,8 @@ module Mumukit::Auth::Grant
   end
 
   class FirstPartGrant < Base
+    attr_accessor :first
+
     def initialize(first)
       @first = first.downcase
     end
@@ -86,12 +92,22 @@ module Mumukit::Auth::Grant
       Mumukit::Auth::Slug.new @first, '*'
     end
 
+    def includes?(other)
+      case other
+      when FirstPartGrant then other.first == first
+      when SingleGrant then other.slug.first == first
+      else false
+      end
+    end
+
     def self.try_parse(pattern)
       new($1) if pattern =~ /(.*)\/\*/
     end
   end
 
   class SingleGrant < Base
+    attr_accessor :slug
+
     def initialize(slug)
       @slug = slug.normalize
     end
@@ -99,6 +115,10 @@ module Mumukit::Auth::Grant
     def allows?(resource_slug)
       resource_slug = resource_slug.to_mumukit_slug.normalize!
       resource_slug.match_first(@slug.first) && resource_slug.match_second(@slug.second)
+    end
+
+    def includes?(other)
+      other.is_a?(SingleGrant) && other.slug == slug
     end
 
     def to_s
