@@ -12,10 +12,34 @@ class Mumukit::Auth::Permissions
     @scopes = scopes.with_indifferent_access
   end
 
-  def has_permission?(role, authorizable)
+  # Deprecated: use `allows` or `authorizes?` instead
+  def has_permission?(role, thing)
+    warn "Don't use has_permission?\n" +
+         "Use allows? if want to validate a slug-like object\n" +
+         "Use authorizes? if you want to validate an authorizable - grant-like or slug-like - object"
+    if thing.is_a?(Mumukit::Auth::Grant::Base)
+      warn "Using authorizes?"
+      authorizes?(role, thing)
+    else
+      warn "Using allows?"
+      allows?(role, thing)
+    end
+  end
+
+  # tells wether this permissions
+  # authorize the given authorizable object for the given role,
+  # or any of its parent roles.
+  def authorizes?(role, authorizable)
     Mumukit::Auth::Role.parse(role).authorizes?(authorizable, self)
   end
 
+  # Similar to `authorizes?`, but specialized for slug-like objects
+  def allows?(role, slug_like)
+    authorizes? role, slug_like.to_mumukit_slug
+  end
+
+  # tells wether this permissions
+  # authorize the given authorizable object for the specific given role
   def role_authorizes?(role, authorizable)
     scope_for(role).authorizes?(authorizable)
   end
@@ -63,7 +87,7 @@ class Mumukit::Auth::Permissions
   end
 
   def delegate_to?(other)
-    other.scopes.all? { |role, scope| has_all_permissions?(role, scope) }
+    other.scopes.all? { |role, scope| authorizes_all?(role, scope) }
   end
 
   def grant_strings_for(role)
@@ -99,7 +123,7 @@ class Mumukit::Auth::Permissions
 
   def assign_to?(other, previous)
     diff = previous.as_set ^ other.as_set
-    diff.all? { |role, grant| has_permission?(role, grant) }
+    diff.all? { |role, grant| authorizes?(role, grant) }
   end
 
   def protect_permissions_assignment!(other, previous)
@@ -134,8 +158,8 @@ class Mumukit::Auth::Permissions
 
   private
 
-  def has_all_permissions?(role, scope)
-    scope.grants.all? { |grant| has_permission? role, grant }
+  def authorizes_all?(role, scope)
+    scope.grants.all? { |grant| authorizes? role, grant }
   end
 
 end

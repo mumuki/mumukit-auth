@@ -152,9 +152,9 @@ describe Mumukit::Auth::Permissions do
 
       it { expect(permissions.teacher? 'test/bar').to eq true }
 
-      it { expect(permissions.has_permission? :teacher, 'test/bar').to be true }
-      it { expect(permissions.has_permission? :teacher, 'Test/Bar').to be true }
-      it { expect(permissions.has_permission? :teacher, 'test/baz').to be false }
+      it { expect(permissions.allows? :teacher, 'test/bar').to be true }
+      it { expect(permissions.allows? :teacher, 'Test/Bar').to be true }
+      it { expect(permissions.allows? :teacher, 'test/baz').to be false }
 
       it { expect(permissions.as_json).to json_like(teacher: 'test/bar') }
 
@@ -162,14 +162,14 @@ describe Mumukit::Auth::Permissions do
         before { permissions.add_permission! :teacher, 'test/*' }
 
         it { expect(permissions).to json_like teacher: 'test/*' }
-        it { expect(permissions.has_permission? :teacher, 'test/baz').to be true }
+        it { expect(permissions.allows? :teacher, 'test/baz').to be true }
       end
 
       context 'when added broader grant with upcase' do
         before { permissions.add_permission! :teacher, 'Test/*' }
 
         it { expect(permissions).to json_like teacher: 'test/*' }
-        it { expect(permissions.has_permission? :teacher, 'test/baz').to be true }
+        it { expect(permissions.allows? :teacher, 'test/baz').to be true }
       end
     end
 

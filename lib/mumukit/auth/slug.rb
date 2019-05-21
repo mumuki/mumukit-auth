@@ -2,10 +2,6 @@ class String
   def to_mumukit_slug
     Mumukit::Auth::Slug.parse self
   end
-
-  def authorized_by?(grant)
-    to_mumukit_slug.authorized_by?(grant)
-  end
 end
 
 module Mumukit::Auth

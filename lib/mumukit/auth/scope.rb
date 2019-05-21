@@ -11,6 +11,11 @@ module Mumukit::Auth
       any_grant? { |grant| authorizable.authorized_by? grant }
     end
 
+    # Similar to `authorizes?`, but specialized for slug-like objects
+    def allows?(slug_like)
+      authorizes? slug_like.to_mumukit_slug
+    end
+
     def add_grant!(*grants)
       grants.each { |grant| push_and_compact! grant }
     end
