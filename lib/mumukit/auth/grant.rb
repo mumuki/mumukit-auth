@@ -68,17 +68,17 @@ module Mumukit::Auth::Grant
       grant.includes? self
     end
 
-    # tells whether the given slug is allowed by
+    # tells whether the given slug-like object is allowed by
     # this grant
     required :allows?
 
-    # tells whether the given grant is included in - that is, is not broader than -
-    # this grant
+    # tells whether the given grant-like object is included
+    # in - that is, is not broader than - this grant
     required :includes?
   end
 
   class AllGrant < Base
-    def allows?(_resource_slug)
+    def allows?(_slug_like)
       true
     end
 
@@ -106,18 +106,19 @@ module Mumukit::Auth::Grant
       [first]
     end
 
-    def allows?(resource_slug)
-      resource_slug.to_mumukit_slug.normalize!.match_first @first
+    def allows?(slug_like)
+      slug_like.to_mumukit_slug.normalize!.match_first @first
     end
 
     def to_s
       "#{@first}/*"
     end
 
-    def includes?(other)
-      case other
-      when FirstPartGrant then other.first == first
-      when SingleGrant then other.slug.first == first
+    def includes?(grant_like)
+      grant = grant_like.to_mumukit_grant
+      case grant
+      when FirstPartGrant then grant.first == first
+      when SingleGrant then grant.slug.first == first
       else false
       end
     end
@@ -138,13 +139,14 @@ module Mumukit::Auth::Grant
       [slug.first]
     end
 
-    def allows?(resource_slug)
-      resource_slug = resource_slug.to_mumukit_slug.normalize!
-      resource_slug.match_first(@slug.first) && resource_slug.match_second(@slug.second)
+    def allows?(slug_like)
+      slug = slug_like.to_mumukit_slug.normalize!
+      slug.match_first(@slug.first) && slug.match_second(@slug.second)
     end
 
-    def includes?(other)
-      other.is_a?(SingleGrant) && other.slug == slug
+    def includes?(grant_like)
+      grant = grant_like.to_mumukit_grant
+      grant.is_a?(SingleGrant) && grant.slug == slug
     end
 
     def to_s

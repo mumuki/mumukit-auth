@@ -89,6 +89,16 @@ describe Mumukit::Auth::Grant do
     it { expect(Mumukit::Auth::Grant.parse('FOO/Bar').allows? 'foo/BAR').to be true }
   end
 
+  describe 'includes?' do
+    it { expect('foo/bar'.to_mumukit_grant.includes? 'foo/bar').to be true }
+    it { expect('foo/*'.to_mumukit_grant.includes? 'foo/*').to be true }
+    it { expect('foo/*'.to_mumukit_grant.includes? 'foo/bar').to be true }
+    it { expect('foo/bar'.to_mumukit_grant.includes? 'foo/*').to be false }
+    it { expect('*'.to_mumukit_grant.includes? 'foo/bar').to be true }
+    it { expect('foo/bar'.to_mumukit_grant.includes? '*').to be false }
+    xit { expect('foo/bar'.to_mumukit_grant.includes? '_/_').to raise_error('invalid grant') }
+  end
+
   describe 'custom grant' do
     class IncludesGrant < Mumukit::Auth::Grant::Base
       def allows?(authorizable)
