@@ -8,7 +8,7 @@ module Mumukit::Auth
     end
 
     def allows?(resource_slug)
-      any_grant? { |grant| grant.allows? resource_slug }
+      any_grant? { |grant| resource_slug.allowed_by? grant  }
     end
 
     def add_grant!(*grants)

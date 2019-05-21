@@ -2,6 +2,10 @@ class String
   def to_mumukit_slug
     Mumukit::Auth::Slug.parse self
   end
+
+  def allowed_by?(grant)
+    to_mumukit_slug.allowed_by?(grant)
+  end
 end
 
 module Mumukit::Auth
@@ -66,6 +70,10 @@ module Mumukit::Auth
 
     def to_mumukit_slug
       self
+    end
+
+    def allowed_by?(grant)
+      grant.allows? self
     end
 
     def self.from_options(hash)

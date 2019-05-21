@@ -53,6 +53,10 @@ module Mumukit::Auth::Grant
     def inspect
       "<Mumukit::Auth::Grant #{to_s}>"
     end
+
+    def allowed_by?(grant)
+      grant.includes? self
+    end
   end
 
   class AllGrant < Base
