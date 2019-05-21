@@ -208,7 +208,7 @@ describe Mumukit::Auth::Permissions do
     end
     context 'when all grant present organizations' do
       let(:permissions) { parse_permissions student: 'pdep/*:*' }
-      it { expect(permissions.student_granted_organizations.size).to eq 1 }
+      it { expect(permissions.student_granted_organizations.size).to eq 0 }
     end
     context 'when one organization appears twice' do
       let(:permissions) { parse_permissions student: 'pdep/*:pdep/*' }

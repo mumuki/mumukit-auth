@@ -42,7 +42,7 @@ class Mumukit::Auth::Permissions
   end
 
   def granted_organizations_for(role)
-    scope_for(role)&.grants&.map { |grant| grant.to_mumukit_slug.organization }.to_set
+    scope_for(role)&.grants&.flat_map { |grant| grant.granted_organizations }.to_set
   end
 
   def add_permission!(role, *grants)

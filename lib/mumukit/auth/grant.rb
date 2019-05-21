@@ -36,6 +36,10 @@ module Mumukit::Auth::Grant
       self
     end
 
+    def granted_organizations
+      []
+    end
+
     def ==(other)
       other.class == self.class && to_s == other.to_s
     end
@@ -80,6 +84,10 @@ module Mumukit::Auth::Grant
       @first = first.downcase
     end
 
+    def granted_organizations
+      [first]
+    end
+
     def allows?(resource_slug)
       resource_slug.to_mumukit_slug.normalize!.match_first @first
     end
@@ -110,6 +118,10 @@ module Mumukit::Auth::Grant
 
     def initialize(slug)
       @slug = slug.normalize
+    end
+
+    def granted_organizations
+      [slug.first]
     end
 
     def allows?(resource_slug)
