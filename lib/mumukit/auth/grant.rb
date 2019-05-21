@@ -74,7 +74,11 @@ module Mumukit::Auth::Grant
 
     # tells whether the given grant-like object is included
     # in - that is, is not broader than - this grant
-    required :includes?
+    #
+    # :warning: Custom grants **should not** override this method
+    def includes?(grant_like)
+      self == grant_like.to_mumukit_grant
+    end
   end
 
   class AllGrant < Base
@@ -142,11 +146,6 @@ module Mumukit::Auth::Grant
     def allows?(slug_like)
       slug = slug_like.to_mumukit_slug.normalize!
       slug.match_first(@slug.first) && slug.match_second(@slug.second)
-    end
-
-    def includes?(grant_like)
-      grant = grant_like.to_mumukit_grant
-      grant.is_a?(SingleGrant) && grant.slug == slug
     end
 
     def to_s
