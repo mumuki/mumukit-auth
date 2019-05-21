@@ -72,10 +72,6 @@ module Mumukit::Auth::Grant
       '*'
     end
 
-    def to_mumukit_slug
-      Mumukit::Auth::Slug.new '*', '*'
-    end
-
     def self.try_parse(pattern)
       new if ['*', '*/*'].include? pattern
     end
@@ -98,10 +94,6 @@ module Mumukit::Auth::Grant
 
     def to_s
       "#{@first}/*"
-    end
-
-    def to_mumukit_slug
-      Mumukit::Auth::Slug.new @first, '*'
     end
 
     def includes?(other)
@@ -139,10 +131,6 @@ module Mumukit::Auth::Grant
 
     def to_s
       @slug.to_s
-    end
-
-    def to_mumukit_slug
-      @slug
     end
 
     def self.try_parse(pattern)
