@@ -7,8 +7,8 @@ module Mumukit::Auth
       add_grant! *grants
     end
 
-    def allows?(authorizable)
-      any_grant? { |grant| authorizable.authorized_by? grant  }
+    def authorizes?(authorizable)
+      any_grant? { |grant| authorizable.authorized_by? grant }
     end
 
     def add_grant!(*grants)

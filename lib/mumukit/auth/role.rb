@@ -9,13 +9,13 @@ module Mumukit::Auth
     # by this role or its parent role
     #
     # This definition is recursive, thus traversing the whole ancenstry chain
-    def allows?(authorizable, permissions)
-      permissions.role_allows?(to_sym, authorizable) ||
-          parent_allows?(authorizable, permissions)
+    def authorizes?(authorizable, permissions)
+      permissions.role_authorizes?(to_sym, authorizable) ||
+          parent_authorizes?(authorizable, permissions)
     end
 
-    def parent_allows?(authorizable, permissions)
-      parent.allows?(authorizable, permissions)
+    def parent_authorizes?(authorizable, permissions)
+      parent.authorizes?(authorizable, permissions)
     end
 
     def to_sym
@@ -57,7 +57,7 @@ module Mumukit::Auth
     class Owner < Role
       parent nil
 
-      def parent_allows?(*)
+      def parent_authorizes?(*)
         false
       end
     end

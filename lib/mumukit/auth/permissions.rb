@@ -13,11 +13,11 @@ class Mumukit::Auth::Permissions
   end
 
   def has_permission?(role, authorizable)
-    Mumukit::Auth::Role.parse(role).allows?(authorizable, self)
+    Mumukit::Auth::Role.parse(role).authorizes?(authorizable, self)
   end
 
-  def role_allows?(role, authorizable)
-    scope_for(role).allows?(authorizable)
+  def role_authorizes?(role, authorizable)
+    scope_for(role).authorizes?(authorizable)
   end
 
   def has_role?(role)

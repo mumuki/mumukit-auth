@@ -36,6 +36,10 @@ module Mumukit::Auth::Grant
       self
     end
 
+    # returns the organizations that are explicitly
+    # granted by this grant
+    #
+    # Custom grants may override this method
     def granted_organizations
       []
     end
@@ -79,6 +83,10 @@ module Mumukit::Auth::Grant
     def includes?(grant_like)
       self == grant_like.to_mumukit_grant
     end
+
+    # Returns a canonical string representation of this grant
+    # Equivalent grant **must** have equivalent string representations
+    required :to_s
   end
 
   class AllGrant < Base
