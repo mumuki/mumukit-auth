@@ -12,12 +12,12 @@ class Mumukit::Auth::Permissions
     @scopes = scopes.with_indifferent_access
   end
 
-  def has_permission?(role, resource_slug)
-    Mumukit::Auth::Role.parse(role).allows?(resource_slug, self)
+  def has_permission?(role, authorizable)
+    Mumukit::Auth::Role.parse(role).allows?(authorizable, self)
   end
 
-  def role_allows?(role, resource_slug)
-    scope_for(role).allows?(resource_slug)
+  def role_allows?(role, authorizable)
+    scope_for(role).allows?(authorizable)
   end
 
   def has_role?(role)

@@ -91,8 +91,8 @@ describe Mumukit::Auth::Grant do
 
   describe 'custom grant' do
     class IncludesGrant < Mumukit::Auth::Grant::Base
-      def allows?(resource_slug)
-        resource_slug.to_mumukit_slug.first.include? 'foo'
+      def allows?(authorizable)
+        authorizable.to_mumukit_slug.first.include? 'foo'
       end
 
       def to_s

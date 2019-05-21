@@ -3,8 +3,8 @@ class String
     Mumukit::Auth::Slug.parse self
   end
 
-  def allowed_by?(grant)
-    to_mumukit_slug.allowed_by?(grant)
+  def authorized_by?(grant)
+    to_mumukit_slug.authorized_by?(grant)
   end
 end
 
@@ -72,7 +72,17 @@ module Mumukit::Auth
       self
     end
 
-    def allowed_by?(grant)
+    # Tells wether the given grant
+    # is authorized by this slug
+    #
+    # This method exist in order to implement double dispatching
+    # for both grant and slugs authorization
+    #
+    # See:
+    #  * `Mumukit::Auth::Grant::Base#authorized_by?`
+    #  * `Mumukit::Auth::Grant::Base#allows?
+    #  * `Mumukit::Auth::Grant::Base#includes?`
+    def authorized_by?(grant)
       grant.allows? self
     end
 

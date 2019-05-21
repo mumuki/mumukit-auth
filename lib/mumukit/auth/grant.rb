@@ -54,9 +54,27 @@ module Mumukit::Auth::Grant
       "<Mumukit::Auth::Grant #{to_s}>"
     end
 
-    def allowed_by?(grant)
+    # Tells wether the given grant
+    # is authorized by this grant
+    #
+    # This method exist in order to implement double dispatching
+    # for both grant and slugs authorization
+    #
+    # See:
+    #  * `Mumukit::Auth::Slug#authorized_by?`
+    #  * `Mumukit::Auth::Grant::Base#allows?
+    #  * `Mumukit::Auth::Grant::Base#includes?`
+    def authorized_by?(grant)
       grant.includes? self
     end
+
+    # tells whether the given slug is allowed by
+    # this grant
+    required :allows?
+
+    # tells whether the given grant is included in - that is, is not broader than -
+    # this grant
+    required :includes?
   end
 
   class AllGrant < Base
