@@ -15,8 +15,11 @@ module Mumukit::Auth
     alias_method :content, :second
 
     def initialize(first, second)
-      raise 'slug first part must be non-nil' unless first
-      raise 'slug second part must be non-nil' unless second
+      raise 'Slug first part must be non-nil' unless first
+      raise 'Slug second part must be non-nil' unless second
+
+      raise "Invalid first part format #{first}" unless first.match? /^[\w\-\.]+$/
+      raise "Invalid second part format #{second}" unless second.match? /^[\w\-\.]+$/
 
       @first = first
       @second = second

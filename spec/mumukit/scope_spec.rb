@@ -18,7 +18,7 @@ describe Mumukit::Auth::Scope do
     it { expect(scope.allows? 'mumuki/logico').to be true }
     it { expect(scope.allows? 'Mumuki/Logico').to be true }
 
-    xit { expect(scope.allows? 'Mumuki/*').to raise_error('invalid slug') }
+    it { expect { scope.allows? 'Mumuki/*' }.to raise_error('Invalid second part format *') }
   end
 
   describe 'grant none' do
