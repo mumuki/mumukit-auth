@@ -15,6 +15,7 @@ describe Mumukit::Auth::Grant do
     it { expect { '[foo]'.to_mumukit_grant }.to raise_error('Invalid slug grant. Cause: Invalid slug [foo]. It must be in first/second format') }
     it { expect { '{foo}'.to_mumukit_grant }.to raise_error('Invalid slug grant. Cause: Invalid slug {foo}. It must be in first/second format') }
     it { expect { '*/foo'.to_mumukit_grant }.to raise_error('Invalid slug grant. Cause: Invalid first part format *') }
+    it { expect { '_/*'.to_mumukit_grant }.to raise_error('Invalid first grant. First part must not be _') }
   end
 
   describe 'compare' do

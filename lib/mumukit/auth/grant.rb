@@ -111,6 +111,7 @@ module Mumukit::Auth::Grant
     attr_accessor :first
 
     def initialize(first)
+      raise Mumukit::Auth::InvalidGrantFormatError, "Invalid first grant. First part must not be _" if  first == '_'
       @first = first.downcase
     end
 
@@ -136,7 +137,7 @@ module Mumukit::Auth::Grant
     end
 
     def self.try_parse(pattern)
-      new($1) if pattern =~ /(.*)\/\*/
+      new($1) if pattern =~ /(.+)\/\*/
     end
   end
 
