@@ -6,6 +6,8 @@ end
 
 module Mumukit::Auth
   class Slug
+    SLUG_REGEXP = /^[[[:alnum:]]\_\ \-\.]+$/
+
     attr_accessor :first, :second
 
     alias_method :organization, :first
@@ -18,8 +20,8 @@ module Mumukit::Auth
       raise 'Slug first part must be non-nil' unless first
       raise 'Slug second part must be non-nil' unless second
 
-      raise "Invalid first part format #{first}" unless first.match? /^[[[:alnum:]]\_\ \-\.]+$/
-      raise "Invalid second part format #{second}" unless second.match? /^[[[:alnum:]]\_\ \-\.]+$/
+      raise "Invalid first part format #{first}" unless first.match? SLUG_REGEXP
+      raise "Invalid second part format #{second}" unless second.match? SLUG_REGEXP
 
       @first = first
       @second = second
