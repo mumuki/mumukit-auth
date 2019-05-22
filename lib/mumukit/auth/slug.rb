@@ -18,8 +18,8 @@ module Mumukit::Auth
       raise 'Slug first part must be non-nil' unless first
       raise 'Slug second part must be non-nil' unless second
 
-      raise "Invalid first part format #{first}" unless first.match? /^[\w\-\.]+$/
-      raise "Invalid second part format #{second}" unless second.match? /^[\w\-\.]+$/
+      raise "Invalid first part format #{first}" unless first.match? /^[[[:alnum:]]\_\ \-\.]+$/
+      raise "Invalid second part format #{second}" unless second.match? /^[[[:alnum:]]\_\ \-\.]+$/
 
       @first = first
       @second = second
