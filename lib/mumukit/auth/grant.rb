@@ -5,6 +5,19 @@ class String
 end
 
 module Mumukit::Auth::Grant
+
+  # Parses a given string that describes a grant
+  # by trying with each grant type, in the following order:
+  #
+  # 1. All grant
+  # 2. Custom grants
+  # 3. First Grant
+  # 4. Slug grant
+  #
+  # Raises a `Mumukit::Auth::InvalidGrantFormatError` if the grant is not valid, which happens when
+  #
+  # * structure is invalid
+  # * `something/_`, `_/something`, `_/_` format is used
   def self.parse(pattern)
     grant_types.each do |type|
       type.try_parse(pattern).try { |it| return it }
@@ -12,7 +25,7 @@ module Mumukit::Auth::Grant
   end
 
   def self.grant_types
-    custom_grant_types + [AllGrant, FirstPartGrant, SingleGrant]
+    [AllGrant] + custom_grant_types + [FirstPartGrant, SingleGrant]
   end
 
   def self.add_custom_grant_type!(grant_type)
