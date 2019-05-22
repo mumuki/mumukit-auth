@@ -39,7 +39,7 @@ describe Mumukit::Auth::Slug do
   it { expect(Mumukit::Auth::Slug.join_s(organization: 'foo', course: 'bar')).to eq 'foo/bar' }
 
   it { expect { Mumukit::Auth::Slug.join('foo', 'bar', 'baz') }.to raise_error 'Slugs must have up to two parts' }
-  it { expect { Mumukit::Auth::Slug.parse('baz') }.to raise_error 'Invalid slug: baz. It must be in first/second format' }
+  it { expect { Mumukit::Auth::Slug.parse('baz') }.to raise_error 'Invalid slug baz. It must be in first/second format' }
 
   it { expect(Mumukit::Auth::Slug.normalize('foo', 'bar').to_s).to eq 'foo/bar' }
   it { expect(Mumukit::Auth::Slug.normalize('Foo', 'Bar').to_s).to eq 'foo/bar' }

@@ -17,11 +17,11 @@ module Mumukit::Auth
     alias_method :content, :second
 
     def initialize(first, second)
-      raise 'Slug first part must be non-nil' unless first
-      raise 'Slug second part must be non-nil' unless second
+      raise Mumukit::Auth::InvalidSlugFormatError, 'Slug first part must be non-nil' unless first
+      raise Mumukit::Auth::InvalidSlugFormatError, 'Slug second part must be non-nil' unless second
 
-      raise "Invalid first part format #{first}" unless first.match? SLUG_REGEXP
-      raise "Invalid second part format #{second}" unless second.match? SLUG_REGEXP
+      raise Mumukit::Auth::InvalidSlugFormatError, "Invalid first part format #{first}" unless first.match? SLUG_REGEXP
+      raise Mumukit::Auth::InvalidSlugFormatError, "Invalid second part format #{second}" unless second.match? SLUG_REGEXP
 
       @first = first
       @second = second
@@ -133,7 +133,7 @@ module Mumukit::Auth
 
     def self.validate_slug!(slug)
       unless slug =~ /\A[^\/\n]+\/[^\/\n]+\z/
-        raise Mumukit::Auth::InvalidSlugFormatError, "Invalid slug: #{slug}. It must be in first/second format"
+        raise Mumukit::Auth::InvalidSlugFormatError, "Invalid slug #{slug}. It must be in first/second format"
       end
     end
   end

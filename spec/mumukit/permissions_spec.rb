@@ -220,7 +220,7 @@ describe Mumukit::Auth::Permissions do
     let(:permissions) { parse_permissions(student: 'foo/bar:test/*:foo/baz') }
 
     it { expect { permissions.student? 'test/*' }.to raise_error 'Invalid second part format *' }
-    it { expect { permissions.student? '*' }.to raise_error 'Invalid slug: *. It must be in first/second format' }
+    it { expect { permissions.student? '*' }.to raise_error 'Invalid slug *. It must be in first/second format' }
 
     context 'when permission is present' do
       before { permissions.remove_permission!(:student, 'test/*') }

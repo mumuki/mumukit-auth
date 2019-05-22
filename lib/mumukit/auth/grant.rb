@@ -144,6 +144,8 @@ module Mumukit::Auth::Grant
     attr_accessor :slug
 
     def initialize(slug)
+      raise Mumukit::Auth::InvalidGrantFormatError, "Invalid slug grant. First part must not be _" if  slug.first == '_'
+      raise Mumukit::Auth::InvalidGrantFormatError, "Invalid slug grant. Second part must not be _" if  slug.second == '_'
       @slug = slug.normalize
     end
 
@@ -162,6 +164,13 @@ module Mumukit::Auth::Grant
 
     def self.try_parse(pattern)
       new(Mumukit::Auth::Slug.parse pattern)
+    rescue Mumukit::Auth::InvalidSlugFormatError => e
+        raise Mumukit::Auth::InvalidGrantFormatError, "Invalid slug grant. Cause: #{e}"
     end
+  end
+end
+
+module Mumukit::Auth
+  class InvalidGrantFormatError < StandardError
   end
 end
