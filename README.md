@@ -106,7 +106,7 @@ a_grant.to_s
 ### Roles
 
 ```ruby
-Mumukit::Auth::Roles.ROLES # answers [:student, :teacher, :headmaster, :writer, :editor, :janitor, :owner]
+Mumukit::Auth::Roles.ROLES # answers [:student, :teacher, :headmaster, :writer, :editor, :janitor, :admin, :owner]
 ```
 
 ### Permissions
