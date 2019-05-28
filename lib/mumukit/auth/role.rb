@@ -4,7 +4,7 @@ module Mumukit::Auth
       @symbol=symbol
     end
 
-    # Tells wether the given authorizable object
+    # Tells whether the given authorizable object
     # can be authorized using the given permissions
     # by this role or its parent role
     #

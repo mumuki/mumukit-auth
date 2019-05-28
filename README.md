@@ -105,7 +105,7 @@ a_grant.to_s
 
 #### Defining custom Grants
 
-Grants can be extend, by inheriting from `Mumukit::Auth::Grant::Base`, and defining the following method:
+Grants can be extended, by inheriting from `Mumukit::Auth::Grant::Base`, and defining the following method:
 
 * `#allows?(resource_slug)`: mandatory
 * `#to_s`: mandatory

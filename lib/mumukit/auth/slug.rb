@@ -73,7 +73,7 @@ module Mumukit::Auth
       self
     end
 
-    # Tells wether the given grant
+    # Tells whether the given grant
     # is authorized by this slug
     #
     # This method exist in order to implement double dispatching

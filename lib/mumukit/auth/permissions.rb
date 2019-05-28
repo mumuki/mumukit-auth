@@ -26,7 +26,7 @@ class Mumukit::Auth::Permissions
     end
   end
 
-  # tells wether this permissions
+  # tells whether this permissions
   # authorize the given authorizable object for the given role,
   # or any of its parent roles.
   def authorizes?(role, authorizable)
@@ -38,7 +38,7 @@ class Mumukit::Auth::Permissions
     authorizes? role, slug_like.to_mumukit_slug
   end
 
-  # tells wether this permissions
+  # tells whether this permissions
   # authorize the given authorizable object for the specific given role
   def role_authorizes?(role, authorizable)
     scope_for(role).authorizes?(authorizable)

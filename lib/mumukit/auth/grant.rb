@@ -71,7 +71,7 @@ module Mumukit::Auth::Grant
       "<Mumukit::Auth::Grant #{to_s}>"
     end
 
-    # Tells wether the given grant
+    # Tells whether the given grant
     # is authorized by this grant
     #
     # This method exist in order to implement double dispatching
