@@ -4,15 +4,57 @@ class String
   end
 end
 
+module Mumukit::Auth::Grant
 
-module Mumukit::Auth
-  class Grant
+  # Parses a given string that describes a grant
+  # by trying with each grant type, in the following order:
+  #
+  # 1. All grant
+  # 2. Custom grants
+  # 3. First Grant
+  # 4. Slug grant
+  #
+  # Raises a `Mumukit::Auth::InvalidGrantFormatError` if the grant is not valid, which happens when
+  #
+  # * structure is invalid
+  # * `something/_`, `_/something`, `_/_` format is used
+  def self.parse(pattern)
+    grant_types.each do |type|
+      type.try_parse(pattern).try { |it| return it }
+    end
+  end
+
+  def self.grant_types
+    [AllGrant] + custom_grant_types + [FirstPartGrant, SingleGrant]
+  end
+
+  def self.add_custom_grant_type!(grant_type)
+    custom_grant_types << grant_type
+  end
+
+  def self.remove_custom_grant_type!(grant_type)
+    custom_grant_types.delete(grant_type)
+  end
+
+  def self.custom_grant_types
+    @custom_grant_types ||= []
+  end
+
+  class Base
     def as_json(options={})
       to_s
     end
 
     def to_mumukit_grant
       self
+    end
+
+    # returns the organizations that are explicitly
+    # granted by this grant
+    #
+    # Custom grants may override this method
+    def granted_organizations
+      []
     end
 
     def ==(other)
@@ -29,22 +71,43 @@ module Mumukit::Auth
       "<Mumukit::Auth::Grant #{to_s}>"
     end
 
-    def self.parse(pattern)
-      case pattern
-        when '*' then
-          AllGrant.new
-        when '*/*' then
-          AllGrant.new
-        when /(.*)\/\*/
-          FirstPartGrant.new($1)
-        else
-          SingleGrant.new(Slug.parse pattern)
-      end
+    # Tells whether the given grant
+    # is authorized by this grant
+    #
+    # This method exist in order to implement double dispatching
+    # for both grant and slugs authorization
+    #
+    # See:
+    #  * `Mumukit::Auth::Slug#authorized_by?`
+    #  * `Mumukit::Auth::Grant::Base#allows?
+    #  * `Mumukit::Auth::Grant::Base#includes?`
+    def authorized_by?(grant)
+      grant.includes? self
     end
+
+    # tells whether the given slug-like object is allowed by
+    # this grant
+    required :allows?
+
+    # tells whether the given grant-like object is included
+    # in - that is, is not broader than - this grant
+    #
+    # :warning: Custom grants **should not** override this method
+    def includes?(grant_like)
+      self == grant_like.to_mumukit_grant
+    end
+
+    # Returns a canonical string representation of this grant
+    # Equivalent grant **must** have equivalent string representations
+    required :to_s
   end
 
-  class AllGrant < Grant
-    def allows?(_resource_slug)
+  class AllGrant < Base
+    def allows?(_slug_like)
+      true
+    end
+
+    def includes?(_)
       true
     end
 
@@ -52,45 +115,76 @@ module Mumukit::Auth
       '*'
     end
 
-    def to_mumukit_slug
-      Mumukit::Auth::Slug.new '*', '*'
+    def self.try_parse(pattern)
+      new if ['*', '*/*'].include? pattern
     end
   end
 
-  class FirstPartGrant < Grant
+  class FirstPartGrant < Base
+    attr_accessor :first
+
     def initialize(first)
+      raise Mumukit::Auth::InvalidGrantFormatError, "Invalid first grant. First part must not be _" if  first == '_'
       @first = first.downcase
     end
 
-    def allows?(resource_slug)
-      resource_slug.to_mumukit_slug.normalize!.match_first @first
+    def granted_organizations
+      [first]
+    end
+
+    def allows?(slug_like)
+      slug_like.to_mumukit_slug.normalize!.match_first @first
     end
 
     def to_s
       "#{@first}/*"
     end
 
-    def to_mumukit_slug
-      Mumukit::Auth::Slug.new @first, '*'
+    def includes?(grant_like)
+      grant = grant_like.to_mumukit_grant
+      case grant
+      when FirstPartGrant then grant.first == first
+      when SingleGrant then grant.slug.first == first
+      else false
+      end
+    end
+
+    def self.try_parse(pattern)
+      new($1) if pattern =~ /(.+)\/\*/
     end
   end
 
-  class SingleGrant < Grant
+  class SingleGrant < Base
+    attr_accessor :slug
+
     def initialize(slug)
+      raise Mumukit::Auth::InvalidGrantFormatError, "Invalid slug grant. First part must not be _" if  slug.first == '_'
+      raise Mumukit::Auth::InvalidGrantFormatError, "Invalid slug grant. Second part must not be _" if  slug.second == '_'
       @slug = slug.normalize
     end
 
-    def allows?(resource_slug)
-      resource_slug = resource_slug.to_mumukit_slug.normalize!
-      resource_slug.match_first(@slug.first) && resource_slug.match_second(@slug.second)
+    def granted_organizations
+      [slug.first]
+    end
+
+    def allows?(slug_like)
+      slug = slug_like.to_mumukit_slug.normalize!
+      slug.match_first(@slug.first) && slug.match_second(@slug.second)
     end
 
     def to_s
       @slug.to_s
     end
 
-    def to_mumukit_slug
-      @slug
+    def self.try_parse(pattern)
+      new(Mumukit::Auth::Slug.parse pattern)
+    rescue Mumukit::Auth::InvalidSlugFormatError => e
+        raise Mumukit::Auth::InvalidGrantFormatError, "Invalid slug grant. Cause: #{e}"
     end
+  end
+end
+
+module Mumukit::Auth
+  class InvalidGrantFormatError < StandardError
   end
 end

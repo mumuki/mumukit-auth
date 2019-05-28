@@ -4,13 +4,18 @@ module Mumukit::Auth
       @symbol=symbol
     end
 
-    def allows?(resource_slug, permissions)
-      permissions.role_allows?(to_sym, resource_slug) ||
-          parent_allows?(resource_slug, permissions)
+    # Tells whether the given authorizable object
+    # can be authorized using the given permissions
+    # by this role or its parent role
+    #
+    # This definition is recursive, thus traversing the whole ancenstry chain
+    def authorizes?(authorizable, permissions)
+      permissions.role_authorizes?(to_sym, authorizable) ||
+          parent_authorizes?(authorizable, permissions)
     end
 
-    def parent_allows?(resource_slug, permissions)
-      parent.allows?(resource_slug, permissions)
+    def parent_authorizes?(authorizable, permissions)
+      parent.authorizes?(authorizable, permissions)
     end
 
     def to_sym
@@ -52,7 +57,7 @@ module Mumukit::Auth
     class Owner < Role
       parent nil
 
-      def parent_allows?(*)
+      def parent_authorizes?(*)
         false
       end
     end

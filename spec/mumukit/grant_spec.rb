@@ -7,6 +7,17 @@ describe Mumukit::Auth::Grant do
     it { expect('Foo/Bar'.to_mumukit_grant.to_s).to eq  'foo/bar' }
   end
 
+  describe '.to_mumukit_grant' do
+    it { expect { '_'.to_mumukit_grant }.to raise_error('Invalid slug grant. Cause: Invalid slug _. It must be in first/second format') }
+    it { expect { '_/_'.to_mumukit_grant }.to raise_error('Invalid slug grant. First part must not be _') }
+    it { expect { 'foo/_'.to_mumukit_grant }.to raise_error('Invalid slug grant. Second part must not be _') }
+    it { expect { 'doo!/foo'.to_mumukit_grant }.to raise_error('Invalid slug grant. Cause: Invalid first part format doo!') }
+    it { expect { '[foo]'.to_mumukit_grant }.to raise_error('Invalid slug grant. Cause: Invalid slug [foo]. It must be in first/second format') }
+    it { expect { '{foo}'.to_mumukit_grant }.to raise_error('Invalid slug grant. Cause: Invalid slug {foo}. It must be in first/second format') }
+    it { expect { '*/foo'.to_mumukit_grant }.to raise_error('Invalid slug grant. Cause: Invalid first part format *') }
+    it { expect { '_/*'.to_mumukit_grant }.to raise_error('Invalid first grant. First part must not be _') }
+  end
+
   describe 'compare' do
     it { expect('foo/baz'.to_mumukit_grant).to eq  'foo/baz'.to_mumukit_grant }
     it { expect('FOO/BAZ'.to_mumukit_grant).to eq  'foo/baz'.to_mumukit_grant }
@@ -89,4 +100,46 @@ describe Mumukit::Auth::Grant do
     it { expect(Mumukit::Auth::Grant.parse('FOO/Bar').allows? 'foo/BAR').to be true }
   end
 
+  describe 'includes?' do
+    it { expect('foo/bar'.to_mumukit_grant.includes? 'foo/bar').to be true }
+    it { expect('foo/*'.to_mumukit_grant.includes? 'foo/*').to be true }
+    it { expect('foo/*'.to_mumukit_grant.includes? 'foo/bar').to be true }
+    it { expect('foo/bar'.to_mumukit_grant.includes? 'foo/*').to be false }
+    it { expect('*'.to_mumukit_grant.includes? 'foo/bar').to be true }
+    it { expect('foo/bar'.to_mumukit_grant.includes? '*').to be false }
+
+    it { expect { 'foo/bar'.to_mumukit_grant.includes? '_/_' }.to raise_error('Invalid slug grant. First part must not be _') }
+    it { expect { 'foo/bar'.to_mumukit_grant.includes? 'foo/_' }.to raise_error('Invalid slug grant. Second part must not be _') }
+  end
+
+  describe 'custom grant' do
+    class IncludesGrant < Mumukit::Auth::Grant::Base
+      def allows?(slug_like)
+        slug_like.to_mumukit_slug.first.include? 'foo'
+      end
+
+      def to_s
+        '[includesFoo]'
+      end
+
+      def self.try_parse(pattern)
+        new if pattern =~ /\[includesFoo\]/
+      end
+    end
+    before(:all) { Mumukit::Auth::Grant.add_custom_grant_type! IncludesGrant  }
+    after(:all) { Mumukit::Auth::Grant.remove_custom_grant_type! IncludesGrant  }
+
+    let(:grant) { Mumukit::Auth::Grant.parse('[includesFoo]') }
+
+    it { expect(Mumukit::Auth::Grant.custom_grant_types).to eq [IncludesGrant]}
+    it { expect(grant.allows? 'foo/baz').to be true }
+    it { expect(grant.allows? 'foobar/baz').to be true }
+    it { expect(grant.allows? 'bar/baz').to be false }
+
+    it { expect(grant.includes? 'foo/baz').to be false }
+    it { expect(grant.includes? 'foobar/baz').to be false }
+    it { expect(grant.includes? 'bar/baz').to be false }
+
+    it { expect(grant.includes? '[includesFoo]').to be true }
+  end
 end

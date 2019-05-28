@@ -103,6 +103,17 @@ a_grant.to_s
 "baz/bar".to_mumukit_grant.allows? Mumukit::Auth::Slug.join('foo') # false
 ```
 
+#### Defining custom Grants
+
+Grants can be extended, by inheriting from `Mumukit::Auth::Grant::Base`, and defining the following method:
+
+* `#allows?(resource_slug)`: mandatory
+* `#to_s`: mandatory
+* `#granted_organizations`: optional
+* `.try_parse(pattern)`: mandatory
+
+New grant types must be registered using: `Mumukit::Auth::Grant.add_custom_grant_type!`
+
 ### Roles
 
 ```ruby
@@ -136,7 +147,7 @@ some_permissions.remove_permission! :student, 'foo/bar'
 some_permissions.update_permission! :student, 'foo/*', 'foo/bar'
 
 # Checking permissions
-some_permissions.has_permission? :student, 'foo/_'
+some_permissions.authorizes? :student, 'foo/_'
 some_permissions.student? 'foo/_' # equivalent to previous line
 some_permissions.protect! :student, 'foo/_' # similar to previous samples,
                                             # but raises and exception instead

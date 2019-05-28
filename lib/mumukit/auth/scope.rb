@@ -7,8 +7,13 @@ module Mumukit::Auth
       add_grant! *grants
     end
 
-    def allows?(resource_slug)
-      any_grant? { |grant| grant.allows? resource_slug }
+    def authorizes?(authorizable)
+      any_grant? { |grant| authorizable.authorized_by? grant }
+    end
+
+    # Similar to `authorizes?`, but specialized for slug-like objects
+    def allows?(slug_like)
+      authorizes? slug_like.to_mumukit_slug
     end
 
     def add_grant!(*grants)
@@ -68,11 +73,11 @@ module Mumukit::Auth
     end
 
     def remove_narrower_grants!(grant)
-      grants.reject! { |it| grant.allows? it }
+      grants.reject! { |it| grant.includes? it }
     end
 
     def has_broader_grant?(grant)
-      grants.any? { |it| it.allows? grant }
+      grants.any? { |it| it.includes? grant }
     end
   end
 end

@@ -109,8 +109,8 @@ describe Mumukit::Auth::Permissions do
     it { expect(permissions.owner?).to be true }
     it { expect(permissions.owner? 'test/student').to be true }
     it { expect(permissions.owner? 'test/_').to be true }
-    it { expect(permissions.owner? 'test/*').to be true }
-    it { expect(permissions.owner? '*/*').to be false }
+    it { expect { permissions.owner? 'test/*' }.to raise_error 'Invalid second part format *' }
+    it { expect { permissions.owner? '*/*' }.to raise_error 'Invalid first part format *' }
 
     it { expect(permissions.writer? 'test/student').to be true }
     it { expect(permissions.writer? 'test/_').to be true }
@@ -152,9 +152,9 @@ describe Mumukit::Auth::Permissions do
 
       it { expect(permissions.teacher? 'test/bar').to eq true }
 
-      it { expect(permissions.has_permission? :teacher, 'test/bar').to be true }
-      it { expect(permissions.has_permission? :teacher, 'Test/Bar').to be true }
-      it { expect(permissions.has_permission? :teacher, 'test/baz').to be false }
+      it { expect(permissions.allows? :teacher, 'test/bar').to be true }
+      it { expect(permissions.allows? :teacher, 'Test/Bar').to be true }
+      it { expect(permissions.allows? :teacher, 'test/baz').to be false }
 
       it { expect(permissions.as_json).to json_like(teacher: 'test/bar') }
 
@@ -162,14 +162,14 @@ describe Mumukit::Auth::Permissions do
         before { permissions.add_permission! :teacher, 'test/*' }
 
         it { expect(permissions).to json_like teacher: 'test/*' }
-        it { expect(permissions.has_permission? :teacher, 'test/baz').to be true }
+        it { expect(permissions.allows? :teacher, 'test/baz').to be true }
       end
 
       context 'when added broader grant with upcase' do
         before { permissions.add_permission! :teacher, 'Test/*' }
 
         it { expect(permissions).to json_like teacher: 'test/*' }
-        it { expect(permissions.has_permission? :teacher, 'test/baz').to be true }
+        it { expect(permissions.allows? :teacher, 'test/baz').to be true }
       end
     end
 
@@ -177,7 +177,7 @@ describe Mumukit::Auth::Permissions do
       before { permissions.add_permission!(:student, 'test/*') }
 
       it { expect(permissions.has_role? :student).to eq true }
-      it { expect(permissions.student? 'test/*').to eq true }
+      it { expect(permissions.student? 'test/_').to eq true }
 
       context 'when added twice' do
         before { permissions.add_permission! :student, 'test/*' }
@@ -208,7 +208,7 @@ describe Mumukit::Auth::Permissions do
     end
     context 'when all grant present organizations' do
       let(:permissions) { parse_permissions student: 'pdep/*:*' }
-      it { expect(permissions.student_granted_organizations.size).to eq 1 }
+      it { expect(permissions.student_granted_organizations.size).to eq 0 }
     end
     context 'when one organization appears twice' do
       let(:permissions) { parse_permissions student: 'pdep/*:pdep/*' }
@@ -219,23 +219,26 @@ describe Mumukit::Auth::Permissions do
   describe 'remove_permission!' do
     let(:permissions) { parse_permissions(student: 'foo/bar:test/*:foo/baz') }
 
+    it { expect { permissions.student? 'test/*' }.to raise_error 'Invalid second part format *' }
+    it { expect { permissions.student? '*' }.to raise_error 'Invalid slug *. It must be in first/second format' }
+
     context 'when permission is present' do
       before { permissions.remove_permission!(:student, 'test/*') }
-      it { expect(permissions.student? 'test/*').to eq false }
+      it { expect(permissions.student? 'test/_').to eq false }
       it { expect(permissions.student? 'foo/bar').to eq true }
       it { expect(permissions.student? 'foo/baz').to eq true }
     end
 
     context 'when scope is not present' do
       before { permissions.remove_permission!(:student, 'baz/*') }
-      it { expect(permissions.student? 'test/*').to eq true }
+      it { expect(permissions.student? 'test/_').to eq true }
       it { expect(permissions.student? 'foo/bar').to eq true }
       it { expect(permissions.student? 'foo/baz').to eq true }
     end
 
     context 'when role is not present' do
       before { permissions.remove_permission!(:teacher, 'baz/*') }
-      it { expect(permissions.student? 'test/*').to eq true }
+      it { expect(permissions.student? 'test/_').to eq true }
       it { expect(permissions.student? 'foo/bar').to eq true }
       it { expect(permissions.student? 'foo/baz').to eq true }
     end
@@ -247,7 +250,7 @@ describe Mumukit::Auth::Permissions do
           headmaster: Mumukit::Auth::Scope.parse('foo/*'),
           owner: Mumukit::Auth::Scope.parse('test/*'))
     end
-    it { expect(permissions.student? 'test/*').to eq true }
+    it { expect(permissions.student? 'test/_').to eq true }
     it { expect(permissions.teacher? 'foo/bar').to eq true }
     it { expect(permissions.headmaster? 'foo/baz').to eq true }
     it { expect(permissions.headmaster? 'bar/baz').to eq false }

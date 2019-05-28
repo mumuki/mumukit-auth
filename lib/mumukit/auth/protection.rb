@@ -1,7 +1,7 @@
 module Mumukit::Auth::Protection
-  def protect!(role, slug)
+  def protect!(role, slug_like)
     raise Mumukit::Auth::UnauthorizedAccessError,
-          "Unauthorized access to #{slug} as #{role}. Scope is `#{scope_for role}`" unless has_permission?(role, slug)
+          "Unauthorized access to #{slug_like} as #{role}. Scope is `#{scope_for role}`" unless allows?(role, slug_like)
   end
 
   def protect_delegation!(other)

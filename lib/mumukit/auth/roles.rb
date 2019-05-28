@@ -4,7 +4,7 @@ module Mumukit::Auth
 
     ROLES.each do |role|
       define_method "#{role}?" do |scope = Mumukit::Auth::Slug.any|
-        has_permission? role.to_sym, scope
+        allows? role.to_sym, scope
       end
     end
   end

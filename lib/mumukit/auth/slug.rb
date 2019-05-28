@@ -6,6 +6,8 @@ end
 
 module Mumukit::Auth
   class Slug
+    SLUG_REGEXP = /^[[[:alnum:]]\_\ \-\.]+$/
+
     attr_accessor :first, :second
 
     alias_method :organization, :first
@@ -15,8 +17,11 @@ module Mumukit::Auth
     alias_method :content, :second
 
     def initialize(first, second)
-      raise 'slug first part must be non-nil' unless first
-      raise 'slug second part must be non-nil' unless second
+      raise Mumukit::Auth::InvalidSlugFormatError, 'Slug first part must be non-nil' unless first
+      raise Mumukit::Auth::InvalidSlugFormatError, 'Slug second part must be non-nil' unless second
+
+      raise Mumukit::Auth::InvalidSlugFormatError, "Invalid first part format #{first}" unless first.match? SLUG_REGEXP
+      raise Mumukit::Auth::InvalidSlugFormatError, "Invalid second part format #{second}" unless second.match? SLUG_REGEXP
 
       @first = first
       @second = second
@@ -68,6 +73,20 @@ module Mumukit::Auth
       self
     end
 
+    # Tells whether the given grant
+    # is authorized by this slug
+    #
+    # This method exist in order to implement double dispatching
+    # for both grant and slugs authorization
+    #
+    # See:
+    #  * `Mumukit::Auth::Grant::Base#authorized_by?`
+    #  * `Mumukit::Auth::Grant::Base#allows?
+    #  * `Mumukit::Auth::Grant::Base#includes?`
+    def authorized_by?(grant)
+      grant.allows? self
+    end
+
     def self.from_options(hash)
       first = hash[:first] || hash[:organization]
       second = hash[:second] || hash[:repository] || hash[:course] || hash[:content]
@@ -114,7 +133,7 @@ module Mumukit::Auth
 
     def self.validate_slug!(slug)
       unless slug =~ /\A[^\/\n]+\/[^\/\n]+\z/
-        raise Mumukit::Auth::InvalidSlugFormatError, "Invalid slug: #{slug}. It must be in first/second format"
+        raise Mumukit::Auth::InvalidSlugFormatError, "Invalid slug #{slug}. It must be in first/second format"
       end
     end
   end
