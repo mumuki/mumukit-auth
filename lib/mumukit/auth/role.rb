@@ -41,12 +41,15 @@ module Mumukit::Auth
       parent :editor
     end
     class Editor < Role
-      parent :owner
+      parent :admin
     end
     class Janitor < Role
-      parent :owner
+      parent :admin
     end
     class Moderator < Role
+      parent :admin
+    end
+    class Admin < Role
       parent :owner
     end
     class Owner < Role
