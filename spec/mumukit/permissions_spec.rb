@@ -8,7 +8,6 @@ describe Mumukit::Auth::Permissions do
   let(:permissions) do
     Mumukit::Auth::Permissions.new(
         student: Mumukit::Auth::Scope.parse('foo/*:test/*'),
-        owner: Mumukit::Auth::Scope.parse('test/*'),
         teacher: Mumukit::Auth::Scope.parse('foo/baz'))
   end
 
@@ -59,7 +58,7 @@ describe Mumukit::Auth::Permissions do
 
   describe 'to_s' do
     it { expect(Mumukit::Auth::Permissions.new.to_s).to eq '!' }
-    it { expect(permissions.to_s).to eq '!student:foo/*:test/*;owner:test/*;teacher:foo/baz' }
+    it { expect(permissions.to_s).to eq '!student:foo/*:test/*;teacher:foo/baz' }
   end
 
   describe '#assign_to?' do
@@ -85,10 +84,8 @@ describe Mumukit::Auth::Permissions do
 
   describe 'parsing' do
     it { expect(permissions).to json_like parse_permissions(student: 'foo/*:test/*',
-                                                            owner: 'test/*',
                                                             teacher: 'foo/baz') }
     it { expect(permissions).to json_like parse_permissions('student' => 'foo/*:test/*',
-                                                            'owner' => 'test/*',
                                                             'teacher' => 'foo/baz') }
   end
 
@@ -97,45 +94,79 @@ describe Mumukit::Auth::Permissions do
       Mumukit::Auth::Permissions.load(permissions.to_json)
     end
 
-    it { expect(permissions.teacher? 'foobar/baz').to be false }
-    it { expect(permissions.teacher? 'foobar/_').to be false }
+    describe 'non-admin permissions' do
+      let(:permissions) { parse_permissions(student: 'foo/*:test/*', teacher: 'foo/baz', writer: 'test/student') }
 
-    it { expect(permissions.teacher? Mumukit::Auth::Slug.parse('foo/baz')).to be true }
-    it { expect(permissions.teacher? Mumukit::Auth::Slug.parse('foobar/_')).to be false }
+      it { expect(permissions.teacher? 'foobar/baz').to be false }
+      it { expect(permissions.teacher? 'foobar/_').to be false }
 
-    it { expect(permissions.teacher? 'foo/baz').to be true }
-    it { expect(permissions.teacher? 'foo/_').to be true }
+      it { expect(permissions.teacher? Mumukit::Auth::Slug.parse('foo/baz')).to be true }
+      it { expect(permissions.teacher? Mumukit::Auth::Slug.parse('foobar/_')).to be false }
 
-    it { expect(permissions.owner?).to be true }
-    it { expect(permissions.owner? 'test/student').to be true }
-    it { expect(permissions.owner? 'test/_').to be true }
-    it { expect(permissions.owner? 'test/*').to be true }
-    it { expect(permissions.owner? '*/*').to be false }
+      it { expect(permissions.teacher? 'foo/baz').to be true }
+      it { expect(permissions.teacher? 'foo/_').to be true }
 
-    it { expect(permissions.writer? 'test/student').to be true }
-    it { expect(permissions.writer? 'test/_').to be true }
+      it { expect(permissions.admin?).to be false }
+      it { expect(permissions.owner?).to be false }
 
-    it { expect(permissions.student?).to be true }
-    it { expect(permissions.student? '_/_').to be true }
-    it { expect(permissions.student? 'foo/bar').to be true }
-    it { expect(permissions.student? 'test/student').to be true }
-    it { expect(permissions.student? 'foo/student').to be true }
-    it { expect(permissions.student? 'baz/student').to be false }
-    it { expect(permissions.student? 'baz/_').to be false }
+      it { expect(permissions.writer? 'test/student').to be true }
+      it { expect(permissions.writer? 'test/_').to be true }
+      it { expect(permissions.writer? 'other/_').to be false }
 
-    it { expect(parsed_permissions.student? 'foo/bar').to be true }
-    it { expect(parsed_permissions.student? 'test/student').to be true }
-    it { expect(parsed_permissions.student? 'foo/student').to be true }
-    it { expect(parsed_permissions.student? 'baz/student').to be false }
-    it { expect(parsed_permissions.student? 'baz/_').to be false }
+      it { expect(permissions.student?).to be true }
+      it { expect(permissions.student? '_/_').to be true }
+      it { expect(permissions.student? 'foo/bar').to be true }
+      it { expect(permissions.student? 'test/student').to be true }
+      it { expect(permissions.student? 'foo/student').to be true }
+      it { expect(permissions.student? 'baz/student').to be false }
+      it { expect(permissions.student? 'baz/_').to be false }
 
-    it { expect { parsed_permissions.protect! :student, 'baz/_' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
-    it { expect { parsed_permissions.protect! :student, 'foo/student' }.not_to raise_error }
-    it { expect { parsed_permissions.protect! :writer, 'foo/student' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
-    it { expect { parsed_permissions.protect! :teacher, 'test/_' }.not_to raise_error }
-    it { expect { parsed_permissions.protect! :teacher, 'foo/_' }.not_to raise_error }
-    it { expect { parsed_permissions.protect! :teacher, 'bar/_' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
-    it { expect { parsed_permissions.protect! :teacher, 'bar/_' }.to raise_error('Unauthorized access to bar/_ as teacher. Scope is `foo/baz`') }
+      it { expect(parsed_permissions.student? 'foo/bar').to be true }
+      it { expect(parsed_permissions.student? 'test/student').to be true }
+      it { expect(parsed_permissions.student? 'foo/student').to be true }
+      it { expect(parsed_permissions.student? 'baz/student').to be false }
+      it { expect(parsed_permissions.student? 'baz/_').to be false }
+
+      it { expect { parsed_permissions.protect! :student, 'baz/_' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
+      it { expect { parsed_permissions.protect! :student, 'foo/student' }.not_to raise_error }
+      it { expect { parsed_permissions.protect! :writer, 'foo/student' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
+      it { expect { parsed_permissions.protect! :teacher, 'test/_' }.to raise_error }
+      it { expect { parsed_permissions.protect! :teacher, 'foo/_' }.not_to raise_error }
+      it { expect { parsed_permissions.protect! :teacher, 'bar/_' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
+      it { expect { parsed_permissions.protect! :teacher, 'bar/_' }.to raise_error('Unauthorized access to bar/_ as teacher. Scope is `foo/baz`') }
+    end
+
+    describe 'owner permissions' do
+      let(:permissions) { parse_permissions(owner: '*') }
+
+      it { expect(permissions.admin?).to be true }
+
+      it { expect(permissions.owner?).to be true }
+      it { expect(permissions.owner? 'test/student').to be true }
+      it { expect(permissions.owner? 'test/_').to be true }
+      it { expect(permissions.owner? 'test/*').to be true }
+      it { expect(permissions.owner? '*/*').to be true }
+
+      it { expect(permissions.writer? 'test/_').to be true }
+
+      it { expect { parsed_permissions.protect! :teacher, 'test/_' }.not_to raise_error }
+    end
+
+    describe 'admin permissions' do
+      let(:permissions) { parse_permissions(admin: '*') }
+
+      it { expect(permissions.owner?).to be false }
+
+      it { expect(permissions.admin?).to be true }
+      it { expect(permissions.admin? 'test/student').to be true }
+      it { expect(permissions.admin? 'test/_').to be true }
+      it { expect(permissions.admin? 'test/*').to be true }
+      it { expect(permissions.admin? '*/*').to be true }
+
+      it { expect(permissions.writer? 'test/_').to be true }
+
+      it { expect { parsed_permissions.protect! :teacher, 'test/_' }.not_to raise_error }
+    end
   end
 
   describe '#grants_for' do
