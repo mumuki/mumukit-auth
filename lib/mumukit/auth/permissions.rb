@@ -41,8 +41,12 @@ class Mumukit::Auth::Permissions
     granted_organizations_for :student
   end
 
+  def any_granted_organizations
+    scopes.values.flat_map(&:grants).map(&:organization).to_set
+  end
+
   def granted_organizations_for(role)
-    scope_for(role)&.grants&.map { |grant| grant.to_mumukit_slug.organization }.to_set
+    scope_for(role)&.grants&.map(&:organization).to_set
   end
 
   def add_permission!(role, *grants)

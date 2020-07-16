@@ -7,6 +7,8 @@ end
 
 module Mumukit::Auth
   class Grant
+    delegate :organization, to: :to_mumukit_slug
+
     def as_json(options={})
       to_s
     end
