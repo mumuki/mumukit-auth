@@ -275,6 +275,29 @@ describe Mumukit::Auth::Permissions do
     end
   end
 
+  describe '#any_granted_roles' do
+    context 'when there is one role' do
+      let(:permissions) { parse_permissions student: 'pdep/*' }
+      it { expect(permissions.any_granted_roles.size).to eq 1 }
+      it { expect(permissions.any_granted_roles).to eq Set['student'] }
+    end
+    context 'when there are two granted roles with different organizations' do
+      let(:permissions) { parse_permissions student: 'pdep/*', teacher: 'alcal/*' }
+      it { expect(permissions.any_granted_roles.size).to eq 2 }
+      it { expect(permissions.any_granted_roles).to eq Set['student', 'teacher'] }
+    end
+    context 'when there is one role with two organizations' do
+      let(:permissions) { parse_permissions student: 'pdep/*:alcal/*' }
+      it { expect(permissions.any_granted_roles.size).to eq 1 }
+      it { expect(permissions.any_granted_roles).to eq Set['student'] }
+    end
+    context 'when there are several grants' do
+      let(:permissions) { parse_permissions student: 'pdep/*:*', teacher: 'alcal/*', owner: 'other/*' }
+      it { expect(permissions.any_granted_roles.size).to eq 3 }
+      it { expect(permissions.any_granted_roles).to eq Set['student', 'teacher', 'owner'] }
+    end
+  end
+
   describe 'remove_permission!' do
     let(:permissions) { parse_permissions(student: 'foo/bar:test/*:foo/baz') }
 
