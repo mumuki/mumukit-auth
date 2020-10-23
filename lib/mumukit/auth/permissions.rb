@@ -45,6 +45,10 @@ class Mumukit::Auth::Permissions
     scopes.values.flat_map(&:grants).map(&:organization).to_set
   end
 
+  def any_granted_roles
+    scopes.select { |_, scope| scope.present? }.keys.to_set
+  end
+
   def granted_organizations_for(role)
     scope_for(role)&.grants&.map(&:organization).to_set
   end
