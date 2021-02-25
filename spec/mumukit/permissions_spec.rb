@@ -224,54 +224,54 @@ describe Mumukit::Auth::Permissions do
     end
   end
 
-  describe '#student_granted_organizations' do
+  describe '#student_granted_organizations_names' do
     context 'when there is one organization' do
       let(:permissions) { parse_permissions student: 'pdep/*' }
-      it { expect(permissions.student_granted_organizations.size).to eq 1 }
+      it { expect(permissions.student_granted_organizations_names.size).to eq 1 }
     end
     context 'when there are granted organization with other roles' do
       let(:permissions) { parse_permissions student: 'pdep/*', teacher: 'alcal/*' }
-      it { expect(permissions.student_granted_organizations.size).to eq 1 }
+      it { expect(permissions.student_granted_organizations_names.size).to eq 1 }
     end
     context 'when there are two organizations' do
       let(:permissions) { parse_permissions student: 'pdep/*:alcal/*' }
-      it { expect(permissions.student_granted_organizations.size).to eq 2 }
+      it { expect(permissions.student_granted_organizations_names.size).to eq 2 }
     end
     context 'when all grant present organizations' do
       let(:permissions) { parse_permissions student: 'pdep/*:*' }
-      it { expect(permissions.student_granted_organizations.size).to eq 1 }
+      it { expect(permissions.student_granted_organizations_names.size).to eq 1 }
     end
     context 'when one organization appears twice' do
       let(:permissions) { parse_permissions student: 'pdep/*:pdep/*' }
-      it { expect(permissions.student_granted_organizations.size).to eq 1 }
+      it { expect(permissions.student_granted_organizations_names.size).to eq 1 }
     end
   end
 
-  describe '#any_granted_organizations' do
+  describe '#any_granted_organizations_names' do
     context 'when there is one organization' do
       let(:permissions) { parse_permissions student: 'pdep/*' }
-      it { expect(permissions.any_granted_organizations.size).to eq 1 }
-      it { expect(permissions.any_granted_organizations).to eq Set['pdep'] }
+      it { expect(permissions.any_granted_organizations_names.size).to eq 1 }
+      it { expect(permissions.any_granted_organizations_names).to eq Set['pdep'] }
     end
     context 'when there are granted organization with other roles' do
       let(:permissions) { parse_permissions student: 'pdep/*', teacher: 'alcal/*' }
-      it { expect(permissions.any_granted_organizations.size).to eq 2 }
-      it { expect(permissions.any_granted_organizations).to eq Set['pdep', 'alcal'] }
+      it { expect(permissions.any_granted_organizations_names.size).to eq 2 }
+      it { expect(permissions.any_granted_organizations_names).to eq Set['pdep', 'alcal'] }
     end
     context 'when there are two organizations' do
       let(:permissions) { parse_permissions student: 'pdep/*:alcal/*' }
-      it { expect(permissions.any_granted_organizations.size).to eq 2 }
-      it { expect(permissions.any_granted_organizations).to eq Set['pdep', 'alcal'] }
+      it { expect(permissions.any_granted_organizations_names.size).to eq 2 }
+      it { expect(permissions.any_granted_organizations_names).to eq Set['pdep', 'alcal'] }
     end
     context 'when all grant present organizations' do
       let(:permissions) { parse_permissions student: 'pdep/*:*' }
-      it { expect(permissions.any_granted_organizations.size).to eq 1 }
-      it { expect(permissions.any_granted_organizations).to eq Set['*'] }
+      it { expect(permissions.any_granted_organizations_names.size).to eq 1 }
+      it { expect(permissions.any_granted_organizations_names).to eq Set['*'] }
     end
     context 'when one organization appears twice' do
       let(:permissions) { parse_permissions student: 'pdep/*:pdep/*' }
-      it { expect(permissions.any_granted_organizations.size).to eq 1 }
-      it { expect(permissions.any_granted_organizations).to eq Set['pdep'] }
+      it { expect(permissions.any_granted_organizations_names.size).to eq 1 }
+      it { expect(permissions.any_granted_organizations_names).to eq Set['pdep'] }
     end
   end
 
