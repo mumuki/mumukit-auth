@@ -30,11 +30,11 @@ class Mumukit::Auth::Permissions
 
   # Answers the organizations for which the user has been explicitly granted access as student.
   # This method does not include the organizations the user has access because of the roles hierarchy
-  def student_granted_organizations
+  def student_granted_organizations_names
     granted_organizations_for :student
   end
 
-  def any_granted_organizations
+  def any_granted_organizations_names
     scopes.values.flat_map(&:grants).map(&:organization).to_set
   end
 
