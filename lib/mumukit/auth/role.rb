@@ -47,6 +47,9 @@ module Mumukit::Auth
       parent :admin
     end
     class Moderator < Role
+      parent :forum_supervisor
+    end
+    class ForumSupervisor < Role
       parent :admin
     end
     class Admin < Role
