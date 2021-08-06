@@ -28,6 +28,9 @@ module Mumukit::Auth
       @roles[role] ||= "Mumukit::Auth::Role::#{role.to_s.camelize}".constantize.new(role.to_sym)
     end
 
+    class ExStudent < Role
+      parent :student
+    end
     class Student < Role
       parent :teacher
     end

@@ -95,7 +95,7 @@ describe Mumukit::Auth::Permissions do
     end
 
     describe 'non-admin permissions' do
-      let(:permissions) { parse_permissions(student: 'foo/*:test/*', teacher: 'foo/baz', writer: 'test/student') }
+      let(:permissions) { parse_permissions(ex_student: 'baz/student:test/student', student: 'foo/*:test/*', teacher: 'foo/baz', writer: 'test/student') }
 
       it { expect(permissions.teacher? 'foobar/baz').to be false }
       it { expect(permissions.teacher? 'foobar/_').to be false }
@@ -121,12 +121,24 @@ describe Mumukit::Auth::Permissions do
       it { expect(permissions.student? 'baz/student').to be false }
       it { expect(permissions.student? 'baz/_').to be false }
 
+      it { expect(permissions.ex_student?).to be true }
+      it { expect(permissions.ex_student? '_/_').to be true }
+      it { expect(permissions.ex_student? 'foo/bar').to be true }
+      it { expect(permissions.ex_student? 'test/student').to be true }
+      it { expect(permissions.ex_student? 'foo/student').to be true }
+      it { expect(permissions.ex_student? 'bar/student').to be false }
+      it { expect(permissions.ex_student? 'bar/_').to be false }
+      it { expect(permissions.ex_student? 'baz/student').to be true }
+      it { expect(permissions.ex_student? 'baz/_').to be true }
+
       it { expect(parsed_permissions.student? 'foo/bar').to be true }
       it { expect(parsed_permissions.student? 'test/student').to be true }
       it { expect(parsed_permissions.student? 'foo/student').to be true }
       it { expect(parsed_permissions.student? 'baz/student').to be false }
       it { expect(parsed_permissions.student? 'baz/_').to be false }
 
+      it { expect { parsed_permissions.protect! :ex_student, 'baz/_' }.not_to raise_error }
+      it { expect { parsed_permissions.protect! :ex_student, 'bar/_' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
       it { expect { parsed_permissions.protect! :student, 'baz/_' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
       it { expect { parsed_permissions.protect! :student, 'foo/student' }.not_to raise_error }
       it { expect { parsed_permissions.protect! :writer, 'foo/student' }.to raise_error(Mumukit::Auth::UnauthorizedAccessError) }
