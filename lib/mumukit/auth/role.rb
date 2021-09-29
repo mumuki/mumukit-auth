@@ -17,7 +17,15 @@ module Mumukit::Auth
       @symbol
     end
 
+    def superseded_by?(other)
+      other.class != self.class && superseded_by_other?(other)
+    end
+
     private
+
+    def superseded_by_other?(other)
+      self.parent.class == other.class || self.parent.superseded_by?(other)
+    end
 
     def self.parent(parent)
       define_method(:parent) { self.class.parse(parent) }
@@ -62,6 +70,10 @@ module Mumukit::Auth
       parent nil
 
       def parent_allows?(*)
+        false
+      end
+
+      def superseded_by_other?(*)
         false
       end
     end
