@@ -13,7 +13,7 @@ class Mumukit::Auth::Permissions
   end
 
   def has_permission?(role, resource_slug)
-    Mumukit::Auth::Role.parse(role).allows?(resource_slug, self)
+    Mumukit::Auth::Role[role].allows?(resource_slug, self)
   end
 
   def role_allows?(role, resource_slug)
@@ -26,6 +26,17 @@ class Mumukit::Auth::Permissions
 
   def scope_for(role)
     self.scopes[role] ||= Mumukit::Auth::Scope.new
+  end
+
+  def compact!
+    old_scopes = @scopes.dup
+    @scopes = {}.with_indifferent_access
+
+    old_scopes.each do |role, scope|
+      scope.grants.each do |grant|
+        push_and_compact! role, grant
+      end
+    end
   end
 
   # Deprecated: use `student_granted_organizations` organizations instead
@@ -54,7 +65,7 @@ class Mumukit::Auth::Permissions
   end
 
   def add_permission!(role, *grants)
-    scope_for(role).add_grant! *grants
+    grants.each { |grant| push_and_compact! role, grant }
   end
 
   def merge(other)
@@ -146,4 +157,19 @@ class Mumukit::Auth::Permissions
     scope.grants.all? { |grant| has_permission? role, grant }
   end
 
+  def push_and_compact!(role, grant)
+    role = Mumukit::Auth::Role[role] # FIXME
+    grant = grant.to_mumukit_grant   # FIXME
+
+    scopes.each do |other_role, other_scope|
+      other_role = Mumukit::Auth::Role[other_role]
+
+      if other_role.narrower_than?(role)
+        other_scope.remove_narrower_grants!(grant)
+      elsif other_role.broader_than?(role) && other_scope.has_broader_grant?(grant)
+        return
+      end
+    end
+    scope_for(role.to_sym).add_grant! grant
+  end
 end

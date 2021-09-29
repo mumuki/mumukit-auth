@@ -17,24 +17,33 @@ module Mumukit::Auth
       @symbol
     end
 
-    def superseded_by?(other)
-      other.class != self.class && superseded_by_other?(other)
+    def broader_than?(other)
+      other.narrower_than? self
+    end
+
+    def narrower_than?(other)
+      other.class != self.class && narrower_than_other?(other)
     end
 
     private
 
-    def superseded_by_other?(other)
-      self.parent.class == other.class || self.parent.superseded_by?(other)
+    def narrower_than_other?(other)
+      self.parent.class == other.class || self.parent.narrower_than?(other)
     end
 
-    def self.parent(parent)
-      define_method(:parent) { self.class.parse(parent) }
+    class << self
+      def parent(parent)
+        define_method(:parent) { self.class.parse(parent) }
+      end
+
+      def parse(role)
+        @roles ||= {}
+        @roles[role] ||= "Mumukit::Auth::Role::#{role.to_s.camelize}".constantize.new(role.to_sym)
+      end
+
+      alias [] parse
     end
 
-    def self.parse(role)
-      @roles ||= {}
-      @roles[role] ||= "Mumukit::Auth::Role::#{role.to_s.camelize}".constantize.new(role.to_sym)
-    end
 
     class ExStudent < Role
       parent :student
@@ -73,7 +82,7 @@ module Mumukit::Auth
         false
       end
 
-      def superseded_by_other?(*)
+      def narrower_than_other?(*)
         false
       end
     end

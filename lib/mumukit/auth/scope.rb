@@ -54,6 +54,14 @@ module Mumukit::Auth
       to_s
     end
 
+    def remove_narrower_grants!(grant)
+      grants.reject! { |it| grant.allows? it }
+    end
+
+    def has_broader_grant?(grant)
+      grants.any? { |it| it.allows? grant }
+    end
+
     private
 
     def any_grant?(&block)
@@ -65,14 +73,6 @@ module Mumukit::Auth
       return if has_broader_grant? grant
       remove_narrower_grants! grant
       grants << grant
-    end
-
-    def remove_narrower_grants!(grant)
-      grants.reject! { |it| grant.allows? it }
-    end
-
-    def has_broader_grant?(grant)
-      grants.any? { |it| it.allows? grant }
     end
   end
 end

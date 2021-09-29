@@ -187,7 +187,28 @@ describe Mumukit::Auth::Permissions do
 
   describe 'add_permission!' do
     let(:permissions) { parse_permissions({}) }
-    context 'when no teacher permissions added' do
+
+    context 'when student and then teacher permissions added' do
+      before { permissions.add_permission!(:student, 'test/bar') }
+      before { permissions.add_permission!(:teacher, 'test/bar') }
+
+      it { expect(permissions.has_role? :student).to be false }
+      it { expect(permissions.has_role? :teacher).to eq true }
+
+      it { expect(permissions.teacher? 'test/bar').to eq true }
+    end
+
+    context 'when teacher and then student permissions added' do
+      before { permissions.add_permission!(:teacher, 'test/bar') }
+      before { permissions.add_permission!(:student, 'test/bar') }
+
+      it { expect(permissions.has_role? :student).to be false }
+      it { expect(permissions.has_role? :teacher).to eq true }
+
+      it { expect(permissions.teacher? 'test/bar').to eq true }
+    end
+
+    context 'when teacher permissions added' do
       before { permissions.add_permission!(:teacher, 'test/bar') }
 
       it { expect(permissions.has_role? :student).to be false }
