@@ -190,22 +190,58 @@ describe Mumukit::Auth::Permissions do
 
     context 'when student and then teacher permissions added' do
       before { permissions.add_permission!(:student, 'test/bar') }
-      before { permissions.add_permission!(:teacher, 'test/bar') }
 
-      it { expect(permissions.has_role? :student).to be false }
-      it { expect(permissions.has_role? :teacher).to eq true }
+      context 'when exact same course is used' do
+        before { permissions.add_permission!(:teacher, 'test/bar') }
 
-      it { expect(permissions.teacher? 'test/bar').to eq true }
+        it { expect(permissions.has_role? :student).to be false }
+        it { expect(permissions.has_role? :teacher).to eq true }
+
+        it { expect(permissions.student? 'test/bar').to eq true }
+        it { expect(permissions.student? 'test/baz').to eq false }
+        it { expect(permissions.teacher? 'test/bar').to eq true }
+        it { expect(permissions.teacher? 'test/baz').to eq false }
+      end
+
+      context 'when wider grant is used' do
+        before { permissions.add_permission!(:teacher, 'test/*') }
+
+        it { expect(permissions.has_role? :student).to be false }
+        it { expect(permissions.has_role? :teacher).to eq true }
+
+        it { expect(permissions.student? 'test/bar').to eq true }
+        it { expect(permissions.student? 'test/baz').to eq true }
+        it { expect(permissions.teacher? 'test/bar').to eq true }
+        it { expect(permissions.teacher? 'test/baz').to eq true }
+      end
     end
 
     context 'when teacher and then student permissions added' do
       before { permissions.add_permission!(:teacher, 'test/bar') }
-      before { permissions.add_permission!(:student, 'test/bar') }
 
-      it { expect(permissions.has_role? :student).to be false }
-      it { expect(permissions.has_role? :teacher).to eq true }
+      context 'when exact same course is used' do
+        before { permissions.add_permission!(:student, 'test/bar') }
 
-      it { expect(permissions.teacher? 'test/bar').to eq true }
+        it { expect(permissions.has_role? :student).to be false }
+        it { expect(permissions.has_role? :teacher).to eq true }
+
+        it { expect(permissions.student? 'test/bar').to eq true }
+        it { expect(permissions.student? 'test/baz').to eq false }
+        it { expect(permissions.teacher? 'test/bar').to eq true }
+        it { expect(permissions.teacher? 'test/baz').to eq false }
+      end
+
+      context 'when wider grant is used' do
+        before { permissions.add_permission!(:student, 'test/*') }
+
+        it { expect(permissions.has_role? :student).to be true }
+        it { expect(permissions.has_role? :teacher).to eq true }
+
+        it { expect(permissions.student? 'test/bar').to eq true }
+        it { expect(permissions.student? 'test/baz').to eq true }
+        it { expect(permissions.teacher? 'test/bar').to eq true }
+        it { expect(permissions.teacher? 'test/baz').to eq false }
+      end
     end
 
     context 'when teacher permissions added' do
