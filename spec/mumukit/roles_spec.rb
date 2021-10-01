@@ -2,18 +2,20 @@ require_relative '../spec_helper'
 
 describe Mumukit::Auth::Role do
 
-  it { expect(Mumukit::Auth::Role[:student]).to be Mumukit::Auth::Role[:student] }
-  it { expect(Mumukit::Auth::Role[:student]).to be_a Mumukit::Auth::Role::Student }
+  it { expect(:student.to_mumukit_role).to be :student.to_mumukit_role }
+  it { expect('student'.to_mumukit_role).to be :student.to_mumukit_role }
+  it { expect(:student.to_mumukit_role.to_mumukit_role).to be :student.to_mumukit_role }
+  it { expect(:student.to_mumukit_role).to be_a Mumukit::Auth::Role::Student }
 
   describe 'narrower_than?' do
-    it { expect(Mumukit::Auth::Role[:student]).to be_narrower_than Mumukit::Auth::Role[:teacher] }
-    it { expect(Mumukit::Auth::Role[:student]).to be_narrower_than Mumukit::Auth::Role[:admin] }
-    it { expect(Mumukit::Auth::Role[:student]).to be_narrower_than Mumukit::Auth::Role[:owner] }
+    it { expect(:student.to_mumukit_role).to be_narrower_than :teacher.to_mumukit_role }
+    it { expect(:student.to_mumukit_role).to be_narrower_than :admin.to_mumukit_role }
+    it { expect(:student.to_mumukit_role).to be_narrower_than :owner.to_mumukit_role }
 
-    it { expect(Mumukit::Auth::Role[:student]).to_not be_narrower_than Mumukit::Auth::Role[:ex_student] }
-    it { expect(Mumukit::Auth::Role[:editor]).to_not be_narrower_than Mumukit::Auth::Role[:student] }
+    it { expect(:student.to_mumukit_role).to_not be_narrower_than :ex_student.to_mumukit_role }
+    it { expect(:editor.to_mumukit_role).to_not be_narrower_than :student.to_mumukit_role }
 
-    it { expect(Mumukit::Auth::Role[:ex_student]).to be_narrower_than Mumukit::Auth::Role[:student] }
-    it { expect(Mumukit::Auth::Role[:ex_student]).to be_narrower_than Mumukit::Auth::Role[:admin] }
+    it { expect(:ex_student.to_mumukit_role).to be_narrower_than :student.to_mumukit_role }
+    it { expect(:ex_student.to_mumukit_role).to be_narrower_than :admin.to_mumukit_role }
   end
 end

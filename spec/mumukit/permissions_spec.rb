@@ -278,6 +278,8 @@ describe Mumukit::Auth::Permissions do
       it { expect(permissions.has_permission? :teacher, 'Test/Bar').to be true }
       it { expect(permissions.has_permission? :teacher, 'test/baz').to be false }
 
+      it { expect(permissions.has_permission? :teacher.to_mumukit_role, 'test/bar').to be true }
+
       it { expect(permissions.as_json).to json_like(teacher: 'test/bar') }
 
       context 'when added broader grant' do

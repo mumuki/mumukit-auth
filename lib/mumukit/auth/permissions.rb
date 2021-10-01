@@ -12,7 +12,7 @@ class Mumukit::Auth::Permissions
   end
 
   def has_permission?(role, resource_slug)
-    Mumukit::Auth::Role[role].allows?(resource_slug, self)
+    role.to_mumukit_role.allows?(resource_slug, self)
   end
 
   def role_allows?(role, resource_slug)
@@ -54,6 +54,7 @@ class Mumukit::Auth::Permissions
   end
 
   def add_permission!(role, *grants)
+    role = role.to_mumukit_role
     grants.each { |grant| push_and_compact! role, grant }
   end
 
@@ -154,11 +155,11 @@ class Mumukit::Auth::Permissions
   end
 
   def push_and_compact!(role, grant)
-    role = Mumukit::Auth::Role[role] # FIXME
-    grant = grant.to_mumukit_grant   # FIXME
+    role = role.to_mumukit_role
+    grant = grant.to_mumukit_grant
 
     scopes.each do |other_role, other_scope|
-      other_role = Mumukit::Auth::Role[other_role]
+      other_role = other_role.to_mumukit_role
 
       if other_role.narrower_than?(role)
         other_scope.remove_narrower_grants!(grant)

@@ -1,3 +1,16 @@
+
+class String
+  def to_mumukit_role
+    Mumukit::Auth::Role.parse self
+  end
+end
+
+class Symbol
+  def to_mumukit_role
+    Mumukit::Auth::Role.parse self
+  end
+end
+
 module Mumukit::Auth
   class Role
     def initialize(symbol)
@@ -25,6 +38,10 @@ module Mumukit::Auth
       other.class != self.class && narrower_than_other?(other)
     end
 
+    def to_mumukit_role
+      self
+    end
+
     private
 
     def narrower_than_other?(other)
@@ -38,12 +55,9 @@ module Mumukit::Auth
 
       def parse(role)
         @roles ||= {}
-        @roles[role] ||= "Mumukit::Auth::Role::#{role.to_s.camelize}".constantize.new(role.to_sym)
+        @roles[role.to_sym] ||= "Mumukit::Auth::Role::#{role.to_s.camelize}".constantize.new(role.to_sym)
       end
-
-      alias [] parse
     end
-
 
     class ExStudent < Role
       parent :student
