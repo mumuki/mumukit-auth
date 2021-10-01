@@ -12,7 +12,23 @@ describe Mumukit::Auth::Permissions do
   end
 
   describe '#parse' do
-    it { expect(Mumukit::Auth::Permissions.parse(nil)).to be_empty }
+    context 'when nil permissions' do
+      it { expect(Mumukit::Auth::Permissions.parse(nil)).to be_empty }
+    end
+
+    context 'when roles can be compacted' do
+      let(:permissions) do
+        parse_permissions writer: 'test/content-1:test/content-2:other/*',
+                          editor: 'test/*:other/course-2',
+                          student: 'other/course-1:test/course-2',
+                          headmaster: 'other/*'
+      end
+
+      it { expect(permissions.to_h).to eq 'writer' => 'other/*',
+                                          'editor' => 'test/*:other/course-2',
+                                          'student' => 'test/course-2',
+                                          'headmaster' => 'other/*' }
+    end
   end
 
   describe '#merge' do
@@ -22,9 +38,15 @@ describe Mumukit::Auth::Permissions do
     it { expect(permissions.merge(permissions)).to json_like(permissions) }
 
     it do
+      permissions_1 = parse_permissions student: 'foo/foobar', teacher: 'foo/bar', owner: 'foobar/baz'
+      permissions_2 = parse_permissions student: 'foo/baz', teacher: 'foo/bar', owner: 'bar/baz'
+      expect(permissions_1.merge(permissions_2)).to json_like student: 'foo/foobar:foo/baz', teacher: 'foo/bar', owner: 'foobar/baz:bar/baz'
+    end
+
+    it "compacts roles when able to do so" do
       permissions_1 = parse_permissions student: 'foo/*', teacher: 'foo/baz', owner: 'foobar/baz'
       permissions_2 = parse_permissions student: 'foo/baz', teacher: 'foo/*', owner: 'bar/baz'
-      expect(permissions_1.merge(permissions_2)).to json_like student: 'foo/*', teacher: 'foo/*', owner: 'foobar/baz:bar/baz'
+      expect(permissions_1.merge(permissions_2)).to json_like student: '', teacher: 'foo/*', owner: 'foobar/baz:bar/baz'
     end
   end
 
@@ -185,7 +207,7 @@ describe Mumukit::Auth::Permissions do
     it { expect(Mumukit::Auth::Permissions.parse(student: 'foo/bar:baz/goo').grant_strings_for :student).to eq ['foo/bar', 'baz/goo'] }
   end
 
-  describe 'add_permission!' do
+  describe '#add_permission!' do
     let(:permissions) { parse_permissions({}) }
 
     context 'when student and then teacher permissions added' do

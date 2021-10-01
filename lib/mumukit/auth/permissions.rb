@@ -7,9 +7,8 @@ class Mumukit::Auth::Permissions
   attr_accessor :scopes
 
   def initialize(scopes={})
-    raise 'invalid scopes' if scopes.any? { |key, value| value.class != Mumukit::Auth::Scope }
-
-    @scopes = scopes.with_indifferent_access
+    @scopes = {}.with_indifferent_access
+    add_scopes! scopes
   end
 
   def has_permission?(role, resource_slug)
@@ -28,16 +27,6 @@ class Mumukit::Auth::Permissions
     self.scopes[role] ||= Mumukit::Auth::Scope.new
   end
 
-  def compact!
-    old_scopes = @scopes.dup
-    @scopes = {}.with_indifferent_access
-
-    old_scopes.each do |role, scope|
-      scope.grants.each do |grant|
-        push_and_compact! role, grant
-      end
-    end
-  end
 
   # Deprecated: use `student_granted_organizations` organizations instead
   def accessible_organizations
@@ -66,6 +55,13 @@ class Mumukit::Auth::Permissions
 
   def add_permission!(role, *grants)
     grants.each { |grant| push_and_compact! role, grant }
+  end
+
+  def add_scopes!(scopes)
+    raise 'invalid scopes' if scopes.any? { |key, value| value.class != Mumukit::Auth::Scope }
+    scopes.each do |role, scope|
+      add_permission! role, *scope.grants
+    end
   end
 
   def merge(other)
