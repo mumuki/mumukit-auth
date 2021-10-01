@@ -60,9 +60,7 @@ class Mumukit::Auth::Permissions
 
   def add_scopes!(scopes)
     raise 'invalid scopes' if scopes.any? { |key, value| value.class != Mumukit::Auth::Scope }
-    scopes.each do |role, scope|
-      add_permission! role, *scope.grants
-    end
+    scopes.each { |role, scope| add_permission! role, *scope.grants }
   end
 
   def merge(other)
