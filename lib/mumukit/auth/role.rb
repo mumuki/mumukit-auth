@@ -35,17 +35,15 @@ module Mumukit::Auth
     end
 
     def narrower_than?(other)
-      other.class != self.class && narrower_than_other?(other)
+      other.class != self.class && _narrower_than_other?(other)
     end
 
     def to_mumukit_role
       self
     end
 
-    private
-
-    def narrower_than_other?(other)
-      self.parent.class == other.class || self.parent.narrower_than?(other)
+    def _narrower_than_other?(other)
+      self.parent.class == other.class || self.parent._narrower_than_other?(other)
     end
 
     class << self
@@ -96,7 +94,7 @@ module Mumukit::Auth
         false
       end
 
-      def narrower_than_other?(*)
+      def _narrower_than_other?(*)
         false
       end
     end
