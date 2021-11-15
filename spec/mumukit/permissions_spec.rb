@@ -31,6 +31,14 @@ describe Mumukit::Auth::Permissions do
     end
   end
 
+  describe '#empty?' do
+    it { expect(parse_permissions(student: '')).to be_empty }
+    it { expect(parse_permissions(student: '', teacher: '')).to be_empty }
+
+    it { expect(parse_permissions(student: 'foo/bar')).to_not be_empty }
+    it { expect(parse_permissions(student: 'foo/bar', teacher: '')).to_not be_empty }
+  end
+
   describe '#merge' do
     it { expect(Mumukit::Auth::Permissions.new.merge(Mumukit::Auth::Permissions.new)).to json_like({}) }
     it { expect(permissions.merge(Mumukit::Auth::Permissions.new)).to json_like permissions }

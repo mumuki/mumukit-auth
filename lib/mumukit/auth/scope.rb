@@ -20,6 +20,10 @@ module Mumukit::Auth
       self.grants.delete(grant)
     end
 
+    def empty?
+      grants.empty?
+    end
+
     def merge(other)
       self.class.new grants + other.grants
     end

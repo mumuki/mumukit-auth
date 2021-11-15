@@ -2,8 +2,6 @@ class Mumukit::Auth::Permissions
   include Mumukit::Auth::Roles
   include Mumukit::Auth::Protection
 
-  delegate :empty?, to: :scopes
-
   attr_accessor :scopes
 
   def initialize(scopes={})
@@ -27,6 +25,20 @@ class Mumukit::Auth::Permissions
     self.scopes[role] ||= Mumukit::Auth::Scope.new
   end
 
+  def empty?
+    scopes.all? {|_, it| it.empty? }
+  end
+
+  def compact!
+    old_scopes = @scopes.dup
+    @scopes = {}.with_indifferent_access
+
+    old_scopes.each do |role, scope|
+      scope.grants.each do |grant|
+        push_and_compact! role, grant
+      end
+    end
+  end
 
   # Deprecated: use `student_granted_organizations` organizations instead
   def accessible_organizations
