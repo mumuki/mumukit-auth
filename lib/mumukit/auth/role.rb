@@ -1,3 +1,16 @@
+
+class String
+  def to_mumukit_role
+    Mumukit::Auth::Role.parse self
+  end
+end
+
+class Symbol
+  def to_mumukit_role
+    Mumukit::Auth::Role.parse self
+  end
+end
+
 module Mumukit::Auth
   class Role
     def initialize(symbol)
@@ -17,15 +30,31 @@ module Mumukit::Auth
       @symbol
     end
 
-    private
-
-    def self.parent(parent)
-      define_method(:parent) { self.class.parse(parent) }
+    def broader_than?(other)
+      other.narrower_than? self
     end
 
-    def self.parse(role)
-      @roles ||= {}
-      @roles[role] ||= "Mumukit::Auth::Role::#{role.to_s.camelize}".constantize.new(role.to_sym)
+    def narrower_than?(other)
+      other.class != self.class && _narrower_than_other?(other)
+    end
+
+    def to_mumukit_role
+      self
+    end
+
+    def _narrower_than_other?(other)
+      self.parent.class == other.class || self.parent._narrower_than_other?(other)
+    end
+
+    class << self
+      def parent(parent)
+        define_method(:parent) { self.class.parse(parent) }
+      end
+
+      def parse(role)
+        @roles ||= {}
+        @roles[role.to_sym] ||= "Mumukit::Auth::Role::#{role.to_s.camelize}".constantize.new(role.to_sym)
+      end
     end
 
     class ExStudent < Role
@@ -62,6 +91,10 @@ module Mumukit::Auth
       parent nil
 
       def parent_allows?(*)
+        false
+      end
+
+      def _narrower_than_other?(*)
         false
       end
     end

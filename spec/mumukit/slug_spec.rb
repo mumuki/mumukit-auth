@@ -48,10 +48,10 @@ describe Mumukit::Auth::Slug do
   it { expect { Mumukit::Auth::Slug.validate_slug!('foo-bar/baz') }.to_not raise_error }
   it { expect { Mumukit::Auth::Slug.validate_slug!('FOO.baR/bAz') }.to_not raise_error }
   it { expect { Mumukit::Auth::Slug.validate_slug!('123/!@#') }.to_not raise_error }
-  
-  it { expect { Mumukit::Auth::Slug.validate_slug!('/') }.to raise_error }
-  it { expect { Mumukit::Auth::Slug.validate_slug!('foo/') }.to raise_error }
-  it { expect { Mumukit::Auth::Slug.validate_slug!('/bar') }.to raise_error }
-  it { expect { Mumukit::Auth::Slug.validate_slug!('foo/bar/baz') }.to raise_error }
-  it { expect { Mumukit::Auth::Slug.validate_slug!("foo/bar\nbaz") }.to raise_error }
+
+  it { expect { Mumukit::Auth::Slug.validate_slug!('/') }.to raise_error Mumukit::Auth::InvalidSlugFormatError }
+  it { expect { Mumukit::Auth::Slug.validate_slug!('foo/') }.to raise_error Mumukit::Auth::InvalidSlugFormatError }
+  it { expect { Mumukit::Auth::Slug.validate_slug!('/bar') }.to raise_error Mumukit::Auth::InvalidSlugFormatError }
+  it { expect { Mumukit::Auth::Slug.validate_slug!('foo/bar/baz') }.to raise_error Mumukit::Auth::InvalidSlugFormatError }
+  it { expect { Mumukit::Auth::Slug.validate_slug!("foo/bar\nbaz") }.to raise_error Mumukit::Auth::InvalidSlugFormatError }
 end
