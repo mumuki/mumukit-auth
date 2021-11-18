@@ -26,7 +26,7 @@ class Mumukit::Auth::Permissions
   end
 
   def empty?
-    scopes.all? {|_, it| it.empty? }
+    scopes.all? { |_, it| it.empty? }
   end
 
   def compact!

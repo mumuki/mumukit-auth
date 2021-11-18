@@ -35,11 +35,11 @@ module Mumukit::Auth
     end
 
     def ==(o)
-      self.class == o.class && self.normalize.eql?(o.normalize)
+      o.is_a?(Mumukit::Auth::Slug) && self.normalize.eql?(o.normalize)
     end
 
     def eql?(o)
-      self.class == o.class && to_s == o.to_s
+      o.is_a?(Mumukit::Auth::Slug) && to_s == o.to_s
     end
 
     def hash
@@ -57,7 +57,15 @@ module Mumukit::Auth
     end
 
     def normalize
-      dup.normalize!
+      Normalized.new(first, second)
+    end
+
+    def normalized_s
+      normalize.to_s
+    end
+
+    def normalized?
+      normalize.eql? self
     end
 
     def inspect
@@ -99,7 +107,7 @@ module Mumukit::Auth
     end
 
     def self.normalize(first, second)
-      new(first, second).normalize!
+      Normalized.new(first, second)
     end
 
     private
@@ -117,11 +125,29 @@ module Mumukit::Auth
         raise Mumukit::Auth::InvalidSlugFormatError, "Invalid slug: #{slug}. It must be in first/second format"
       end
     end
+
+    class Normalized < Slug
+      alias_method :_normalize!, :normalize!
+
+      def initialize(*)
+        super
+        _normalize!
+      end
+
+      def normalize
+        self
+      end
+
+      def normalize!
+        self
+      end
+
+      def normalized?
+        true
+      end
+    end
   end
 
   class InvalidSlugFormatError < StandardError
   end
 end
-
-
-
