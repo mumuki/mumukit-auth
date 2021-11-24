@@ -47,26 +47,32 @@ Usage:
 ```ruby
 
 # Creation
-Mumukit::Auth:Slug.new('first', 'second')
-Mumukit::Auth:Slug.from_options(first: 'hello', second: 'world')
-Mumukit::Auth:Slug.from_options(organization: 'hello', repository: 'world')
+Mumukit::Auth::Slug.new('first', 'second')
+Mumukit::Auth::Slug.from_options(first: 'hello', second: 'world')
+Mumukit::Auth::Slug.from_options(organization: 'hello', repository: 'world')
+Mumukit::Auth::Slug::Normalized.from_options(organization: 'Hello', repository: 'World!') # answers the slug hello/world
 
-Mumukit::Auth:Slug.join('first', 'second')
-Mumukit::Auth:Slug.join(first: 'first', second: 'second')
-Mumukit::Auth:Slug.join('first') # answers the slug 'first/_'
+Mumukit::Auth::Slug.join('first', 'second')
+Mumukit::Auth::Slug.join(first: 'first', second: 'second')
+Mumukit::Auth::Slug.join('first') # answers the slug 'first/_'
+Mumukit::Auth::Slug::Normalized.join(first: 'fïrst', second: 'sécond') # answers the slug first/second
 
-Mumukit::Auth:Slug.join_s('first', 'second') # answers the string 'first/second'
-Mumukit::Auth:Slug.join_s('first') # answers the string 'first/_'
+Mumukit::Auth::Slug.join_s('first', 'second') # answers the string 'first/second'
+Mumukit::Auth::Slug.join_s('first') # answers the string 'first/_'
+Mumukit::Auth::Slug::Normalized.join_s('FIRST', 'Second') # answers the string 'first/second'
 
 # Parsing
-Mumukit::Auth:Slug.parse("hello/world")
+Mumukit::Auth::Slug.parse("hello/world")
 
 # Convertion from and to string
 "hello/world".to_mumukit_slug
-Mumukit::Auth:Slug.new('foo', 'bar').to_s
+Mumukit::Auth::Slug.new('foo', 'bar').to_s
 
 # Comparing
-"hello/world".to_mumukit_slug == "hello/world".to_mumukit_slug
+"hello/world".to_mumukit_slug == "hello/world".to_mumukit_slug # true
+"Hello/World!".to_mumukit_slug == "hello/world".to_mumukit_slug # true
+"Hello/World!".to_mumukit_slug.eql? "hello/world".to_mumukit_slug # false
+"Hello/World!".to_mumukit_slug.normalize.eql? "hello/world".to_mumukit_slug # true
 
 # Matching
 "hello/world".to_mumukit_slug.match_first 'hello'
@@ -205,5 +211,3 @@ Mumukit::Token.decode encoded_token, Mumukit::Auth:Client.new(client: :custom_cl
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
-
