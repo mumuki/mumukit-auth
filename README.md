@@ -164,6 +164,7 @@ Tokens are easy-to-use JWT tokens.
 
 ```ruby
 # Creating
+Mumukit::Auth::Token.build uid, expiration: 5.minutes.from_now, metadata: {key: value}
 Mumukit::Auth::Token.new metadata: {key: value}, iss: '...', aud: '...'
 Mumukit::Auth::Token.new {...},
                          Mumukit::Auth::Client.new client: :myclient # use a custom client, see above
@@ -173,8 +174,8 @@ Mumukit::Auth::Token.decode('eyJh...XVCJ9.eA....X0.yRQ..Xw')
 Mumukit::Auth::Token.decode_header('bearer eyJh...XVCJ9.eA....X0.yRQ..Xw')
 
 # Encoding
-Mumukit::Auth::Token.encode(metadata: {key: value}) # answers a jwt **string**
 a_token.encode # answers a jwt **string**
+a_token.encode_header # answers a bearer header **string**
 
 # Verification
 a_token.verify_client!
@@ -202,7 +203,7 @@ Mumukit::Auth.configure do |config|
    config.clients.custom_client_2 = {id: '...', secret: '...'}
 end
 #...and then use them
-Mumukit::Token.encode uid, metadata, Mumukit::Auth:Client.new(client: :custom_client_1)
+Mumukit::Token.build(uid, Mumukit::Auth:Client.new(client: :custom_client_1)).encode
 Mumukit::Token.decode encoded_token, Mumukit::Auth:Client.new(client: :custom_client_2)
 
 ```
