@@ -2,7 +2,7 @@ module Mumukit::Auth
   class Token
     attr_reader :jwt, :client
 
-    def initialize(jwt, client)
+    def initialize(jwt={}, client = Mumukit::Auth::Client.new)
       @jwt = jwt
       @client = client
     end
@@ -68,7 +68,7 @@ module Mumukit::Auth
       header.split(' ').last
     end
 
-    def self.build(uid, client=Mumukit::Auth::Client.new,
+    def self.build(uid, client = Mumukit::Auth::Client.new,
                    expiration: nil, organization: nil,
                    subject_id: nil, subject_type: nil,
                    metadata: {})
@@ -85,10 +85,8 @@ module Mumukit::Auth
     end
 
     def self.load(encoded)
-      if encoded.nil?
-        nil
-      else
-        decode encoded
+      if encoded.present?
+        decode encoded rescue nil
       end
     end
 

@@ -84,4 +84,16 @@ describe Mumukit::Auth::Token do
       it { expect(token.metadata).to eq({}) }
     end
   end
+
+  describe 'serialization' do
+    let(:token) { Mumukit::Auth::Token.build 'mary@example.com' }
+    let(:expired_token) { Mumukit::Auth::Token.build 'mary@example.com', expiration: 1.day.ago }
+
+    it("can create empty, replicable token") {  expect(Mumukit::Auth::Token.new.encode).to eq Mumukit::Auth::Token.new.encode }
+
+    it { expect(Mumukit::Auth::Token.load(token.encode).jwt).to eq token.jwt  }
+    it { expect(Mumukit::Auth::Token.load(expired_token.encode)).to be nil  }
+
+    it { expect(Mumukit::Auth::Token.dump token).to eq token.encode  }
+  end
 end
