@@ -36,9 +36,9 @@ describe Mumukit::Auth::Token do
     end
 
     context 'not expired' do
-      let(:expiration) { 5.minutes.from_now }
+      let(:expiration) { 5.minutes.from_now.round }
 
-      it { expect(token.expiration.inspect).to eq expiration.inspect }
+      it { expect(token.expiration).to eq expiration }
       it { expect(token.organization).to eq 'central' }
       it { expect(token.subject_type).to eq 'exercise' }
       it { expect(token.subject_id).to eq 485 }
@@ -52,13 +52,13 @@ describe Mumukit::Auth::Token do
                                               "uid"=>"foo@bar.com"
       end
 
-      it { expect(Mumukit::Auth::Token.decode(token.encode).expiration.inspect).to eq expiration.inspect }
+      it { expect(Mumukit::Auth::Token.decode(token.encode).expiration).to eq expiration }
       it { expect(token.encode).to start_with 'ey' }
 
     end
 
     context 'expired' do
-      let(:expiration) { 5.minutes.ago }
+      let(:expiration) { 5.minutes.ago.round }
 
       it { expect(token.encode).to start_with 'ey' }
       it { expect { Mumukit::Auth::Token.decode token.encode }.to raise_error 'Signature has expired' }
@@ -87,7 +87,7 @@ describe Mumukit::Auth::Token do
 
   describe 'serialization' do
     let(:token) { Mumukit::Auth::Token.build 'mary@example.com' }
-    let(:expired_token) { Mumukit::Auth::Token.build 'mary@example.com', expiration: 1.day.ago }
+    let(:expired_token) { Mumukit::Auth::Token.build 'mary@example.com', expiration: 1.day.ago.round }
 
     it("can create empty, replicable token") {  expect(Mumukit::Auth::Token.new.encode).to eq Mumukit::Auth::Token.new.encode }
 
