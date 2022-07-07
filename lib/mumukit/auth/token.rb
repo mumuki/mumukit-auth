@@ -2,7 +2,7 @@ module Mumukit::Auth
   class Token
     attr_reader :jwt, :client
 
-    def initialize(jwt={}, client = Mumukit::Auth::Client.new)
+    def initialize(jwt = {}, client = Mumukit::Auth::Client.new)
       @jwt = jwt
       @client = client
     end
