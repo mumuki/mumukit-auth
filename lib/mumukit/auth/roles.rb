@@ -1,7 +1,7 @@
 module Mumukit::Auth
   module Roles
     ROLES = [:ex_student, :student, :teacher, :headmaster, :writer, :editor, :janitor,
-             :moderator, :forum_supervisor, :manager, :admin, :owner]
+             :moderator, :supervisor, :manager, :admin, :owner]
 
     ROLES.each do |role|
       define_method "#{role}?" do |scope = Mumukit::Auth::Slug.any|
