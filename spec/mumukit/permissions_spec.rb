@@ -404,6 +404,14 @@ describe Mumukit::Auth::Permissions do
     end
   end
 
+  describe 'clear!' do
+    let(:permissions) { parse_permissions(student: '*') }
+
+    before { permissions.clear! }
+
+    it { expect(permissions).to be_empty }
+  end
+
   describe 'remove_permission!' do
     let(:permissions) { parse_permissions(student: 'foo/bar:test/*:foo/baz') }
 
