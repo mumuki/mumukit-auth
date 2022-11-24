@@ -12,12 +12,6 @@ describe Mumukit::Auth::Token do
   end
 
   describe 'decode_header' do
-    context 'with legacy encode_header' do
-      let(:header) { Mumukit::Auth::Token.encode_header('foo@bar.com', foo: 'bar') }
-
-      it { expect(Mumukit::Auth::Token.decode_header(header).metadata).to json_like foo: 'bar' }
-    end
-
     context 'with current encode_header' do
       let(:header) { Mumukit::Auth::Token.build('foo@bar.com', metadata: {foo: 'bar'}).encode_header }
 
