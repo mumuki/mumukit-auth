@@ -81,10 +81,10 @@ module Mumukit::Auth
     class Moderator < Role
       parent :supervisor
     end
-    class Supervisor < Role
-      parent :manager
-    end
     class Manager < Role
+      parent :supervisor
+    end
+    class Supervisor < Role
       parent :admin
     end
     class Admin < Role
