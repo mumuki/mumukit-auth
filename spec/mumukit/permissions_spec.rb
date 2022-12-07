@@ -136,6 +136,8 @@ describe Mumukit::Auth::Permissions do
       it { expect(permissions.teacher? 'foo/baz').to be true }
       it { expect(permissions.teacher? 'foo/_').to be true }
 
+      it { expect(permissions.manager? 'foo/*').to be false }
+      it { expect(permissions.manager?).to be false }
       it { expect(permissions.admin?).to be false }
       it { expect(permissions.owner?).to be false }
 
@@ -181,6 +183,9 @@ describe Mumukit::Auth::Permissions do
     describe 'owner permissions' do
       let(:permissions) { parse_permissions(owner: '*') }
 
+      it { expect(permissions.manager?).to be true }
+      it { expect(permissions.manager? 'foo/*').to be true }
+      it { expect(permissions.manager? 'foo/_').to be true }
       it { expect(permissions.admin?).to be true }
 
       it { expect(permissions.owner?).to be true }
@@ -397,6 +402,14 @@ describe Mumukit::Auth::Permissions do
       it { expect(permissions.any_granted_roles.size).to eq 3 }
       it { expect(permissions.any_granted_roles).to eq Set['student', 'teacher', 'owner'] }
     end
+  end
+
+  describe 'clear!' do
+    let(:permissions) { parse_permissions(student: '*') }
+
+    before { permissions.clear! }
+
+    it { expect(permissions).to be_empty }
   end
 
   describe 'remove_permission!' do

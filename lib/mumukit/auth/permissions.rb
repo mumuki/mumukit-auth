@@ -5,7 +5,7 @@ class Mumukit::Auth::Permissions
   attr_accessor :scopes
 
   def initialize(scopes={})
-    @scopes = {}.with_indifferent_access
+    clear!
     add_scopes! scopes
   end
 
@@ -130,6 +130,10 @@ class Mumukit::Auth::Permissions
 
   def protect_permissions_assignment!(other, previous)
     raise Mumukit::Auth::UnauthorizedAccessError unless assign_to?(self.class.reparse(other), previous)
+  end
+
+  def clear!
+    @scopes = {}.with_indifferent_access
   end
 
   def as_set

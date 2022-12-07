@@ -111,8 +111,11 @@ a_grant.to_s
 
 ### Roles
 
+![roles hierarchy](https://yuml.me/diagram/plain/class/[Student]^-[ExStudent],[Teacher]^-[Student],[Headmaster]^-[Teacher],[Janitor]^-[Headmaster],[Editor]^-[Writer],[Manager]^-[Editor],[Manager]^-[Janitor],[Supervisor]^-[Moderator],[Supervisor]^-[Manager],[Admin]^-[Supervisor],[Owner]^-[Admin]).
+
+
 ```ruby
-Mumukit::Auth::Roles.ROLES # answers [:student, :teacher, :headmaster, :writer, :editor, :janitor, :admin, :owner]
+Mumukit::Auth::Roles.ROLES # answers [:ex_student, :student, :teacher, :headmaster, :writer, :editor, :janitor, :moderator, :supervisor, :manager, :admin, :owner]
 ```
 
 ### Permissions

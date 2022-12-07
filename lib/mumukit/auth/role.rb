@@ -73,15 +73,18 @@ module Mumukit::Auth
       parent :editor
     end
     class Editor < Role
-      parent :admin
+      parent :manager
     end
     class Janitor < Role
-      parent :admin
+      parent :manager
     end
     class Moderator < Role
-      parent :forum_supervisor
+      parent :supervisor
     end
-    class ForumSupervisor < Role
+    class Manager < Role
+      parent :supervisor
+    end
+    class Supervisor < Role
       parent :admin
     end
     class Admin < Role

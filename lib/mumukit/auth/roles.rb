@@ -1,6 +1,13 @@
 module Mumukit::Auth
   module Roles
-    ROLES = [:ex_student, :student, :teacher, :headmaster, :writer, :editor, :janitor, :moderator, :forum_supervisor, :admin, :owner]
+    FINE_GRAINED_ROLES = [
+      :ex_student, :student, :teacher, :headmaster, :writer, :editor, :janitor,
+      :moderator, :manager
+    ]
+    COARSE_GRAINED_ROLES = [:supervisor, :admin, :owner]
+
+    ROLES = COARSE_GRAINED_ROLES + FINE_GRAINED_ROLES
+
 
     ROLES.each do |role|
       define_method "#{role}?" do |scope = Mumukit::Auth::Slug.any|
@@ -9,4 +16,3 @@ module Mumukit::Auth
     end
   end
 end
-

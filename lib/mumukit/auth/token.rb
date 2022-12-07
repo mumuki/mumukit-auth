@@ -43,20 +43,10 @@ module Mumukit::Auth
       'Bearer ' + encode
     end
 
-    def self.encode(uid, metadata, client = Mumukit::Auth::Client.new)
-      warn "Deprecated: please use build and then encode"
-      build(uid, client, metadata: metadata).encode
-    end
-
     def self.decode(encoded, client = Mumukit::Auth::Client.new)
       new client.decode(encoded), client
     rescue JWT::DecodeError => e
       raise Mumukit::Auth::InvalidTokenError.new(e)
-    end
-
-    def self.encode_header(uid, metadata)
-      warn "Deprecated: please use build and then encode_header"
-      'Bearer ' + build(uid, metadata: metadata).encode_header
     end
 
     def self.decode_header(header, client = Mumukit::Auth::Client.new)
