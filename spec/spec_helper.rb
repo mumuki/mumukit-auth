@@ -1,3 +1,5 @@
+Warning[:deprecated] = true
+
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'mumukit/auth'
 require 'mumukit/core/rspec'
