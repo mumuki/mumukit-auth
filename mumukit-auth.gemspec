@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 
 
   spec.add_dependency 'jwt', '~> 1.5'
-  spec.add_dependency 'mumukit-core', '~> 1.8'
+  spec.add_dependency 'mumukit-core', '~> 1.19'
 
-  spec.required_ruby_version = '~> 3.1'
+  spec.required_ruby_version = '>= 3.0'
 end

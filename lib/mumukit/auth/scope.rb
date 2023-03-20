@@ -4,7 +4,7 @@ module Mumukit::Auth
 
     def initialize(grants=[])
       @grants = []
-      add_grant! *grants
+      add_grant!(*grants)
     end
 
     def allows?(resource_slug)
