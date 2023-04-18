@@ -10,15 +10,19 @@ module Mumukit::Auth
     end
 
     def decoded_secret
-      JWT.base64url_decode(secret)
+      JWT::Decode.base64url_decode(secret)
     end
 
     def encode(jwt_hash)
-      JWT.encode(jwt_hash, decoded_secret)
+      JWT.encode(jwt_hash, decoded_secret, algorithm)
     end
 
     def decode(encoded_jwt)
-      JWT.decode(encoded_jwt, decoded_secret)[0]
+      JWT.decode(encoded_jwt, decoded_secret, true, { algorithm: algorithm })[0]
+    end
+
+    def algorithm
+      'HS256'
     end
 
     private
